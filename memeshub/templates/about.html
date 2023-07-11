@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+<style>
+    body {
+        position: relative;
+    }
+
+    div.text-white {
+        padding: 100px 10px;
+        margin: 0;
+        margin-top: -3px;
+    }
+
+    .nav-link a:active {
+        color: gold;
+        height: 30%;
+    }
+
+    #div1 {
+        padding: 100px 20px;
+        text-align: center;
+    }
+
+    #div1 p {
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        padding-top: 10%
+    }
+
+    #div2 {
+        text-align: center;
+    }
+
+    div.card {
+        position: relative;
+        float: left;
+    }
+
+    div#abtpage {
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+
+    .text {
+        float: left;
+    }
+
+    .cta-banner#developer {
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<body data-bs-spy="scroll" data-bs-target=".navbar" data-bs-offset="50">
+    {% block content %}
+    <div class="navbar navbar-expand-lg bg-dark navabr-dark fixed-top py-0">
+        <div class="container-fluid sticky-top">
+            <h1>
+                <span style="color: gold;">Memes</span><kbd style="background-color: black;">hub</kbd>
+            </h1>
+            <ul class="nav ml-auto text-light">
+                <li class="nav-item text-secondary">
+                    <a href="#about" class="nav-link ">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#developer" class="nav-link">Developed-By</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <br></br>
+    <hr>
+    <div class="container-fluid pt-2 bg-gradient bg-primary text-white" id="div1">
+        <p class="display-1">Meme is Fun!!😊</p>
+    </div>
+    <br>
+    <div class="container-fluid bg-light" id="div2">
+        <p class="display-2 pt-2">Don't Have Fun alone</p>
+        <p class="display-3">Share with Your Friends Too</p>
+    </div>
+    <br>
+    <div class="container py-5" id="about">
+        <div class="row">
+            <div class="card bg-white">
+                <div class="card-body">
+                    <h4 class="text-muted">Greetings</h4><br>
+                    <div class="text-primary" id="abtpage">
+                        <h5 class="">What is memeshub</h5>
+                        <p>Memeshub is an art and entertainment website which aims to spread fun through a <a
+                                href="https://en.wikipedia.org/wiki/Meme" class="text-danger">meme. </a>With thousands
+                            of memes on
+                            memeshub you'll definitely spark your day, plus you can save and view later</p>
+                        <p class="py-0">Memes Reveals The Playful nature of human beings.</p>
+                    </div>
+                    <p class="card-text">
+                        This platform has been designed for the purpose of entertainment, Anyone can visit this site at
+                        any time of
+                        their choice and have fun.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="cta-banner" id="developer">
+        <div class="container-fluid py-5">
+            <div class="row">
+                <h6 class="display-6" style="color: darkorchid;">developed-by</h6>
+                <div class="col-sm-12 col-md-12 col-lg-6 pb-4">
+                    <div class="card " style="width: 300px;">
+                        <img class="card-img-top" src="{% static 'images/Wilfred.jpg' %}" alt="myPhoto"
+                            style="width: 100%;">
+                        <div class="card-body">
+                            <h3 class="card-title">Wilfred Omwaga</h3>
+                            <p class="card-text">Wilfred is a junior Fullstack developer who is ambitious in solving
+                    different clients daily problems and providing a perfect solution. He is currently studying at Meru
+                    University of Science and Technology and pursuing BSc in
+                    Mathematics and Computer Science</p>
+                            <a href="mailto:omwagawilfred@gmail.com" class="btn btn-info">contact Me</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+    {% endblock %}
+    {% include "footer.html" %}
+</body>
+<script>
+</script>
+
+</html>

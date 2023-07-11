@@ -1,0 +1,160 @@
+{% load static %}
+{% load social_share %}
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    div#divOne{
+        position: sticky;
+    }
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no">
+    {% load bootstrap5 %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <title>www.memeshub.com</title>
+</head>
+<body>
+{% include "base.html" %}
+{% block content %}
+<div class="bg-dark" id="divOne">
+    <ul class="pagination justify-content-center py-0">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a href="?page={{page_obj.previous_page_number}}" class="page-link">Previous</a></li>
+        {% endif %}
+        <li class="page-item"><a class="page-link">{{ page_obj.number}}</a></li>
+        {% if page_obj.has_next %}
+        <li class="page-item"><a href="?page={{page_obj.next_page_number}}" class="page-link">Next</a></li>
+        {% endif %}
+    </ul>
+</div>
+<div id="one" class="carousel slide pt-2 d-block d-sm-none" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#one" data-bs-slide-to="0" class="active bg-warning"></button>
+        <button type="button" data-bs-target="#one" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#one" data-bs-slide-to="2"></button>
+        <button type="button" data-bs-target="#one" data-bs-slide-to="3"></button>
+        <button type="button" data-bs-target="#one" data-bs-slide-to="4"></button>
+    </div>
+    <div class="carousel-inner pt-2" height="200px" width="200px">
+        <div class="carousel-item active">
+            <img src="{% static 'images/beauty.jpg' %}" alt="" class=" img-fluid" width="100%" height="15%">
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/pray.jpg' %}" alt="" class=" img-fluid" width="100%" height="15%">
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/life.jpg' %}" alt="" class="img-fluid" width="100%" height="15%">
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/single.jpg' %}" alt="" class="img-fluid" width="100%" height="15%">
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/lovememes.jpg' %}" alt="" class="img-fluid" width="100%" height="10%">
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#one" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#one" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+<br>
+    <form action="">
+        {% csrf_token %}
+        <div class="container">
+        <div class="row">
+            {% for x in page_obj %}
+            <div class="col-sm-6 col-lg-3 bg-light">
+                <div class="card m-2">
+                    <img src="{{ x.photo.url }}" alt="" class="card-img-top img-fluid" height="200px" width="200">
+                    <div class="card-footer align-items-center">
+                        <small class="text-muted">{{ x.date }}</small>
+                            <span><a href="{{ x.photo.url}}" data-bs-toggle="modal" data-bs-target="#shareModal"><i class="material-icons">&#xe80d;</i></span></a>&nbsp;
+                            <span><a href="{{ x.photo.url}}" download="{{ x.photo.url}}" id="download">
+                                <i class="material-icons">&#xe2c4;</i></a></span>                        
+                    </div>
+                    <p class="text-center text-">{{ x.caption }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    </form>
+    <br>
+    <div class="modal fade" id="shareModal">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="text-primary">Share to:</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% load static %}
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                    {% post_to_facebook object_or_url '<i style="font-size:24px" class="fa">&#xf082;facebook</i>'%}&nbsp;
+                    {% post_to_whatsapp object_or_url '<i style="font-size:24px" class="fa text-success">&#xf232;whatsapp</i>'%}&nbsp;
+                    {% post_to_telegram 'Hey! Check out this meme 😊' object_or_url '<i style="font-size:24px" class="fa text-primary">&#xf2c6;telegram</i>' %}&nbsp;
+                    {% post_to_twitter 'Hey! check out this meme 😊' object_or_url '<i style="font-size:24px" class="fa">&#xf081;twitter</i>' %}&nbsp;
+                    {% send_email 'funny meme' 'Hey! check out this meme 😊' object_or_url '<i class="material-icons" id="mail" style="color: brown;">&#xe0be;</i>' %}                              
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="bg-dark">
+        {% if page_obj.has_other_pages %}
+        <ul class="pagination justify-content-center pt-2">
+            {% if page_obj.has_previous %}
+            <a href="?page=1" class="btn btn-outline-secondary mb-3" style="border-radius: 1px; border:solid#d3d3d3;">First</a>
+            <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number}}">
+                <i class="material-icons">&#xe408;</i></a></li>
+            {% else %}
+            <li class="page-item-disabled"></li>
+            {% endif %}
+        
+            {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+            <li class="page-item-active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
+            {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %}
+            {% endfor %}
+        
+            {% if page_obj.has_next %}
+            <li class="page-item">
+            <a class="page-link" href="?page={{page_obj.next_page_number}}">
+                <i class="material-icons">&#xe409;</i></a></li>
+            <a href="?page={{ page_obj.paginator.num_pages}}" class="btn btn-outline-secondary mb-3"
+                style="border-radius: 1px; border:solid#d3d3d3;">Last</a>
+            {% else %}
+            <li class="page-item-disabled"></li>
+            {% endif %}
+            {% endif %}
+    </div>
+<br>
+{% endblock %}
+{% include "footer.html" %}
+</body>
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerE1) {
+        return new bootstrap.Tooltip(tooltipTriggerE1)
+    })
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+
+</html>

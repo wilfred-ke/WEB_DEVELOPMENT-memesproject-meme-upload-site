@@ -1,0 +1,11 @@
+{% load i18n %}
+{% autoescape off %}
+Welcome to memeshub
+
+Hello {{ username }}
+
+Please Confirm your email by clicking on the following link
+
+Confirmation Link: http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+{% endautoescape %}

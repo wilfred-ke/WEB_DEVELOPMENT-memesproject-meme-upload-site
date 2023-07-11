@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <title>memeshub/footer</title>
+</head>
+<style>
+    a {
+        text-decoration: none;
+    }
+</style>
+
+<body>
+    <footer>
+        <div class="container-fluid bg-dark text-light mt-5 pt-5">
+            <div class="container py-5">
+                <div class="row">
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        <h6>Contact Us</h6>
+                        <p class="font-weight-light"><a href="mailto:smemeshub@gmail.com">smemeshub@gmail.com</a></p>
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        <h6>Follow Me</h6>
+                        <p class="font-weight-light">
+                            <a href="https://www.instagram.com/wilfrd_ke" rel="noopener noreferrer" target=_blank>
+                                <img src="{% static 'images/instagram.jpeg' %}" alt="Instagram" class="img-fluid"
+                                    style="width: auto; height: 30px; object-fit: scale-down;"></a>
+                            <a href="https://www.linkedin.com/in/wilfred-omwaga-789267263/" rel="noopener noreferrer"
+                                target="_blank"><img src="{% static 'images/linkedin.png' %}" alt="LinkedIn"
+                                    class="img-fluid" style="width: auto; height: 30px; object-fit: scale-down;"></a>
+                        </p>
+                    </div>
+                    <div class="col-sm-12 col-md-6 col-lg-6">
+                        <h5>
+                            <img src="{% static 'images/logo.png' %}" alt="" width="30" height="30">
+                            Memeshub
+                        </h5>
+                        <p style="font-size: 12px;">Welcome to <abbr title="Memeshub">MH</abbr> The best free meme
+                            collections site.The
+                            Memeshub team is always updating and adding more memes everyday. It's all here and very
+                            enjoyable anyone who has an
+                            account on this site can upload their memes to be viewed by others and spread fun together.
+                            We also have huge free meme
+                            selection that you can download or view. We are working toward adding more features. Send a
+                            feedback for any queries</p>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav justify-content-center">
+                <li class="nav-item"><a href="{% url 'homepage' %}" class="nav-link">Home</a></li>
+                <br><br>
+                <li class="nav-item"><a href="#feedback" data-bs-toggle="collapse" class="nav-link">Feedback</a></li>
+                <div class="collapse" id="feedback">
+                    sends us feedback via <a href="mailto:smemeshub@gmail.com" class="text-success">smemeshub@gmail.com</a>
+                </div>
+                <br><br>
+                <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">About</a></li>
+                <br><br>
+                <li class="nav-item"><a href="#support" data-bs-toggle="collapse" class="nav-link">Contact Support</a>
+                    <div class="collapse" id="support">
+                        <p>For any queries contact us via <a href="mailto:smemeshub@gmail.com"
+                                class="text-info">smemehub@gmail.com</a></p>
+                    </div>
+                </li>
+                <br><br>
+                <li class="nav-item"><a href="#discover" class="nav-link" data-bs-toggle="collapse">Discover</a>
+                    <div class="collapse" id="discover">
+                        <ul>
+                            <li>
+                                <h6>Work with Me:<a href="mailto:omwagawilfred@gmail.com" class="text-info">Email Me<a>
+                                            <h6>
+                            </li>
+                            <li>
+                                <h6><a href="blogs" class="" target="_blank">memeshub-blogs</a></h6>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <br>
+                <li class="nav-item"><a href="{% url 'privacy' %}" class="nav-link" target="_blank">Privacy,Terms and Conditions</a></li>
+            </ul>
+        </div>
+        </li>
+        </ul>
+        <div class="container text-center py-3">
+            <p style="font-size: 12px;">Copyright &copy; memeshub 2023</p>
+        </div>
+        </div>
+    </footer>
+</body>
+
+</html>

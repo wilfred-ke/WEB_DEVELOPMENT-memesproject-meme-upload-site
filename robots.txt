@@ -1,0 +1,17 @@
+# Googlebot and Adsbot
+User-agent: Googlebot
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: Googlebot-news
+Allow: /
+
+User-agent: *
+Allow: /
+
+User-agent: Unnecessarybot
+Disallow: /
+Disallow: /public/
+
+User-agent: *
+Allow: /
