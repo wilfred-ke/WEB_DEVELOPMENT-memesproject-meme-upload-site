@@ -1,1 +1,1 @@
-web: gunicorn memehub.wsgi:application --log-file -  
+web: gunicorn memesproject.wsgi:application --log-file -  
