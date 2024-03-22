@@ -18,7 +18,7 @@
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <title>www.memeshub.com</title>
+    <title>memeshub.social</title>
 </head>
 <body>
 {% include "base.html" %}
@@ -70,24 +70,39 @@
     <form action="">
         {% csrf_token %}
         <div class="container">
-        <div class="row">
-            {% for x in page_obj %}
-            <div class="col-sm-6 col-lg-3 bg-light">
-                <div class="card m-2">
-                    <img src="{{ x.photo.url }}" alt="" class="card-img-top img-fluid" height="200px" width="200">
-                    <div class="card-footer align-items-center">
+            <div class="row">
+                {% for x in page_obj %}
+                <div class="col-sm-6 col-lg-3 bg-light">
+                    <div class="card m-2">
                         <small class="text-muted">{{ x.date }}</small>
-                            <span><a href="{{ x.photo.url}}" data-bs-toggle="modal" data-bs-target="#shareModal"><i class="material-icons">&#xe80d;</i></span></a>&nbsp;
-                            <span><a href="{{ x.photo.url}}" download="{{ x.photo.url}}" id="download">
-                                <i class="material-icons">&#xe2c4;</i></a></span>                        
+                        <img src="{{ x.photo.url }}" alt="" class="card-img-top img-fluid" height="200px" width="200">
+                        <div class="card-footer align-items-center">
+                            <div class="d-flex justify-content-between align-items-center w-100">
+                                <div>
+                                    <a href="{{ x.photo.url}}" data-bs-toggle="modal" data-bs-target="#shareModal"><i
+                                            class="material-icons">&#xe80d;</i></a>
+                                    <a href="{{ x.photo.url}}" download="{{ x.photo.url}}" id="download"><i
+                                            class="material-icons">&#xe2c4;</i></a>
+                                </div>
+                                <form action="{% url 'like_meme' x.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" name="meme_id" value="{{ x.id }}" class="btn btn-link" id="like"><i
+                                            class="material-icons">favorite</i></button>&nbsp; {{ x.total_likes }}
+                                </form>
+                                <form action="{% url 'dislike_meme' x.pk %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" name="meme_id" value="{{ x.id }}" class="btn btn-link" id="dislike"><i class="material-icons">thumb_down</i></button>&nbsp; {{ x.total_dislikes }}
+                                </form>
+                            </div>
+                        </div>
+                        <p class="text-center text-">{{ x.caption }}</p>
                     </div>
-                    <p class="text-center text-">{{ x.caption }}</p>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
-    </div>
     </form>
+
     <br>
     <div class="modal fade" id="shareModal">
         <div class="modal-dialog modal-sm">

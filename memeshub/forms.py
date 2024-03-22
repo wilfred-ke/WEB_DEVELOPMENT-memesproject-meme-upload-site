@@ -6,3 +6,4 @@ class ImageForm(forms.ModelForm):
         model = Image
         fields = "__all__"
         labels = {'photo':''}
+        exclude = {'likes', 'dislikes',}

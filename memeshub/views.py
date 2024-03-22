@@ -1,11 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import View
 from django.core.paginator import Paginator
+from django.urls import reverse_lazy, reverse
 from django.views import generic
 from .forms import ImageForm
 from .models import Image
@@ -35,27 +36,62 @@ def upload(request):
        form = ImageForm()
     return render(request, 'upload.html', {'form': form})
 
-def index(request):  
+def LikeView(request, pk):
+   if request.user.is_authenticated:
+      meme = get_object_or_404(Image, id=request.POST.get('meme_id'))
+
+       # Check if the user has already disliked the meme
+      if meme.dislikes.filter(id=request.user.id):
+         messages.warning(request, 'You cannot like and dislike the same meme.')
+         return HttpResponseRedirect(reverse('homepage'))
+      
+      if meme.likes.filter(id=request.user.id):
+         meme.likes.remove(request.user)
+      else:
+            meme.likes.add(request.user)
+
+      return HttpResponseRedirect(reverse('homepage'))
+
+   # Handle the case when the user is not authenticated
+   messages.success(request, 'You must be logged in to like this meme.') 
+   return HttpResponseRedirect(reverse('homepage'))     
+
+def DislikeView(request, pk):
+   if request.user.is_authenticated:
+      meme = get_object_or_404(Image, id=request.POST.get('meme_id'))
+
+      # Check if the user has already liked the meme
+      if meme.likes.filter(id=request.user.id):
+         messages.warning(request, 'You cannot like and dislike the same meme.')
+         return HttpResponseRedirect(reverse('homepage'))
+
+      if meme.dislikes.filter(id=request.user.id):
+         meme.dislikes.remove(request.user)
+      else:
+         meme.dislikes.add(request.user)
+
+        # Redirect back to the previous page or a specific URL
+      return HttpResponseRedirect(reverse('homepage'))
+
+    # Handle the case when the user is not authenticated
+   messages.success(request, 'You must be logged in to dislike this meme.')
+    # You may want to redirect to the login page or a specific URL
+   return HttpResponseRedirect(reverse('homepage'))
+
+def index(request):
     if request.method == 'GET':
      img = Image.objects.all().order_by('-date')
      paginator = Paginator(img, 100)
      page_number = request.GET.get('page')
      page_obj = paginator.get_page(page_number)
-     print('Img=', img)
-     print()
-     print('Paginator=', paginator)
-     print()
-     print('Page_Number=', page_number)
-     print()
-     print('Page_Obj=', page_obj)
-     print()
+
      if 'q' in request.GET:
        q = request.GET['q']
        multiple_q = Q(Q(caption__icontains=q) | Q(date__icontains=q))
        page_obj = Image.objects.filter(multiple_q)
     else:
        img = Image.objects.all()
-    return render(request, 'index.html', {'page_obj':page_obj})
+    return render(request, 'index.html', {'page_obj': page_obj})
 
 
 def download(path):

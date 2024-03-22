@@ -14,6 +14,8 @@ urlpatterns = [
     path('activate/<uidb64>/<token>', views.activate, name='activate'),
     path('blogs', views.blogs, name="blogs"),
     path('privacy', views.privacy, name='privacy'),
+    path('like/<int:pk>', views.LikeView, name="like_meme"),
+    path('dislike/<int:pk>', views.DislikeView, name='dislike_meme'),
     
     path('reset_password/', auth_views.PasswordResetView.as_view(template_name="password_reset.html"), name='reset_password'),
     path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name="password_reset_sent.html"), name='password_reset_done'),
