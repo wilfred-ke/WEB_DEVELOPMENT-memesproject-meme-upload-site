@@ -1,3 +1,6 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -9,9 +12,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from .forms import ImageForm
-from .models import Image
+from .models import Image, Profile
 from django.db.models import Q
-from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
@@ -134,6 +136,12 @@ def signup(request):
         myuser.is_active = False
         myuser.save()
         messages.success( request, 'Your account has been successfully created. A confirmation email has been mailed to you please check your email to activate your account')
+
+        # create a profile object for new user
+        user_model = User.objects.get(username=username)
+        new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
+        new_profile.save()
+
         #welcome email
         subject = "Welcome to memeshub login"
         message = "Hello, " + myuser.username + "\n" + "Welcome to memeshub!! \n Thank you for visiting our website \n Please confirm your email address in order to activate your account. \n\n Thanking you\n Memeshub, The Best Meme collection site."
@@ -156,7 +164,7 @@ def signup(request):
            [myuser.email]
         )
         email.fail_silently = True
-        email.send()
+        email.send()   
         return redirect('signIn')
 
     return render(request, "signup.html")
@@ -188,7 +196,7 @@ def check(request, email):
          messages.error(request, "Your email is invalid")
          return render(request, 'signup.html')
 
-
+# @login_required(login_url='signin')
 def signIn(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -222,4 +230,11 @@ def blogs(request):
 def privacy(request):
    return render(request, 'privacy.html')
 
+@login_required(login_url='signIn')
+def user_settings(request):
+   user_profile = Profile.objects.get(user=request.user)
+   return render(request, 'user_settings.html', {'user_profile': user_profile})
+
+def robots(request):
+   return render(request, 'robots.txt')
 

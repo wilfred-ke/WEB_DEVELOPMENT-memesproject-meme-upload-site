@@ -102,12 +102,15 @@
                 </span>
                 <ul class="dropdown-menu">
                     <li class="input-group">
-                        <h2 class="dropdown-header input-grup-text">@{{ request.user }}</h2>
+                        <h2 class="dropdown-header input-grup-text">@{{ request.user.username }}</h2>
                     </li>
                     <hr>
                     <a href="{% url 'signOut' %}" class="dropdown-item"><i class="material-icons">&#xe5c8;</i>Sign Out</a>
                     <hr>
                     <a href="{% url 'upload' %}" class="dropdown-item"><i class="material-icons">cloud_upload</i>Upload</a>
+                    <hr>
+                    <a href="{% url 'user_settings' %}" class="dropdown-item text-decoration-none">Settings</a>
+                    <hr>
                 </ul>
             </div>
             {% else %}
