@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
+    <title>Explore - TrendWave</title>
+</head>
+
+<body>
+    <div id="contentId">
+        {% include "base.html" %}
+        {% block content %}
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3 d-none d-lg-block d-xl-block">
+                    <div class="sidebar border-3 sidebar-item" id="id_sidebar">
+                        <!-- Sidebar content -->
+                        <ul>
+                            <a href="/" class="nav-link pt-2"><button class="btn" id="sidebarId">
+                                    <h5>Home</h5>
+                                </button></a>
+                            <a href="#" class="nav-link pt-2"><button class="btn" id="sidebarId">
+                                    <h5>Explore</h5>
+                                </button></a>
+                            <a href="{% url 'following' %}" class="nav-link pt-2"><button class="btn" id="sidebarId">
+                                    <h5>Following</h5>
+                                </button></a>
+                            <a href="{% url 'about' %}" class="nav-link pt-2"><button class="btn" id="sidebarId">
+                                    <h5>About</h5>
+                                </button></a>
+                            <a href="{% url 'discover' %}" class="nav-link pt-2"><button class="btn" id="sidebarId">
+                                    <h5>Discover</h5>
+                                </button></a>
+                            <br></br>
+                            <hr>
+                            <ul class="navbar-toggler">
+                                <div class="d-none d-lg-block d-xl-block">
+                                    {% if user.is_authenticated %}
+                                    {{ pass }}
+                                    {% else %}
+                                    <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-outline-danger"
+                                            style="width: 50%;">
+                                            <h4>Log in</h4>
+                                        </button></a>
+                                    {% endif %}
+                                </div>
+                            </ul>
+                        </ul>
+                        <footer>
+                            <p style="color: blueviolet;">Join theTrendWave Community.Explore a world of creativity,
+                                entertainment, and
+                                discovery as you scroll through our curated selection of trending topics. From viral
+                                challenges
+                                to the
+                                hottest memes, TrendWave keeps you in the loop with what's capturing the internet's
+                                attention
+                                right
+                                <code>now.</code>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <div class="container">
+                                <h1 class="mt-5">Explore</h1>
+                                <p>Discover content in your favorite categories.</p>
+                                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                                    <!-- Comedy Section -->
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Comedy</h5>
+                                                <p class="card-text">Explore hilarious memes, jokes, and funny videos.
+                                                </p>
+                                                <a href="comedy.html" class="btn btn-primary">Explore</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Relationships Section -->
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Relationships</h5>
+                                                <p class="card-text">Discover advice, tips, and stories about
+                                                    relationships.</p>
+                                                <a href="relationships.html" class="btn btn-primary">Explore</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Sports Section -->
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Sports</h5>
+                                                <p class="card-text">Stay updated with the latest sports news and
+                                                    highlights.</p>
+                                                <a href="sports.html" class="btn btn-primary">Explore</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Fashion Section -->
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Fashion</h5>
+                                                <p class="card-text">Find trendy fashion tips, styles, and outfit ideas.
+                                                </p>
+                                                <a href="fashion.html" class="btn btn-primary">Explore</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endblock %}
+    </div>
+</body>
+</html>

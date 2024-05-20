@@ -1,0 +1,44 @@
+div#divOne {
+    position: sticky;
+}
+
+#id_sidebar {
+    position: fixed;
+    width: 350px;
+    overflow-y: hidden;
+    top: 10%;
+    bottom: 0;
+}
+
+.sidebar-item {
+    padding: 10px;
+}
+
+/* Hover effect */
+.sidebar-item:hover {
+    border-right: 1px solid #e4dddd;
+}
+
+/* Border between sidebar and main body */
+.container-fluid {
+    border-right: 1px solid #faf6f6;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: black;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin-right: 5px;
+    border: 1px solid transparent;
+
+}
+
+.nav-link:hover {
+    background-color: #f7f1f1;
+}
+
+#sidebarId {
+    font-family: 'Bree serif', serif;
+    color: rgb(7, 7, 7);
+}

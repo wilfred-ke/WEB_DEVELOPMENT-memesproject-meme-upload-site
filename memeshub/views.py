@@ -406,6 +406,13 @@ def following(request):
         'suggestions_username_profile_list': suggestions_username_profile_list
     })
 
+
+def explore(request):
+   return render(request, 'explore.html')
+
+
+def discover(request):
+   return render(request, 'discover.html')
 # def search_user_query(request):
    # user_object = User.objects.get(username=request.user.username)
    # user_profile = TheProfile.objects.get(user=user_object)
