@@ -6,35 +6,66 @@
     div#divOne{
         position: sticky;
     }
+    #id_sidebar{
+        position: fixed;
+        width: 350px;
+        overflow-y: hidden;
+        top: 10%;
+        bottom: 0;
+    }
+    .sidebar-item {
+        padding: 10px;
+    }
+
+    /* Hover effect */
+    .sidebar-item:hover {
+        border-right: 1px solid #e4dddd; 
+    }
+
+    /* Border between sidebar and main body */
+    .container-fluid {
+        border-right: 1px solid #faf6f6; 
+    }
+    .nav-link {
+        text-decoration: none;
+        color: black;
+        display: inline-block; 
+        padding: 0.5rem 1rem; 
+        margin-right: 5px;
+        border: 1px solid transparent;
+        
+    }
+
+    .nav-link:hover {
+        background-color: #f7f1f1; 
+    }
+    #sidebarId{
+        font-family: 'Bree serif', serif;
+        color: rgb(7, 7, 7);
+    }
+
 </style>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no">
-    <meta name="description" content="Chat📱,Upload😊,Download ⬇,Share and Have Fun😂🤣!! The Best Free Meme Collection Site."/>
+    <meta name="description" content="Explore a world of creativity, entertainment, and discovery.Chat📱,Upload😊,Download ⬇,Share and Have Fun😂🤣!!"/>
+    <meta name="description" content="Welcome to TrendWave, where you can dive into the latest trends and ride the waves of viral content. Explore a world of creativity, entertainment, and discovery as you scroll through our curated selection of trending topics. From viral challenges to the hottest memes, TrendWave keeps you in the loop with what's capturing the internet's attention right now.">
     {% load bootstrap5 %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <title>memeshub</title>
+    <title>TrendWave - Ride the Wave of Trends</title>
 </head>
-<body>
+<body>   
+<div id="contentId">
 {% include "base.html" %}
 {% block content %}
-<div class="bg-dark" id="divOne">
-    <ul class="pagination justify-content-center py-0">
-        {% if page_obj.has_previous %}
-        <li class="page-item"><a href="?page={{page_obj.previous_page_number}}" class="page-link">Previous</a></li>
-        {% endif %}
-        <li class="page-item"><a class="page-link">{{ page_obj.number}}</a></li>
-        {% if page_obj.has_next %}
-        <li class="page-item"><a href="?page={{page_obj.next_page_number}}" class="page-link">Next</a></li>
-        {% endif %}
-    </ul>
-</div>
+<br>
 <div id="one" class="carousel slide pt-2 d-block d-sm-none" data-bs-ride="carousel">
     <div class="carousel-indicators">
         <button type="button" data-bs-target="#one" data-bs-slide-to="0" class="active bg-warning"></button>
@@ -67,43 +98,93 @@
         <span class="carousel-control-next-icon"></span>
     </button>
 </div>
-<br>
-    <form action="">
-        {% csrf_token %}
-        <div class="container">
-            <div class="row">
-                {% for x in page_obj %}
-                <div class="col-sm-6 col-lg-3 bg-light">
-                    <div class="card m-2">
-                        <small class="text-muted">{{ x.date }}</small>
-                        <img src="{{ x.photo.url }}" alt="" class="card-img-top img-fluid" style="width: auto; height: 200px; object-fit: scale-down;">
-                        <div class="card-footer align-items-center">
-                            <div class="d-flex justify-content-between align-items-center w-100">
-                                <div>
-                                    <a href="{{ x.photo.url}}" data-bs-toggle="modal" data-bs-target="#shareModal"><i
-                                            class="material-icons">&#xe80d;</i></a>
-                                    <a href="{{ x.photo.url}}" download="{{ x.photo.url}}" id="download"><i
-                                            class="material-icons">&#xe2c4;</i></a>
-                                </div>
-                                <form action="{% url 'like_meme' x.pk %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" name="meme_id" value="{{ x.id }}" class="btn btn-link" id="like"><i
-                                            class="material-icons">favorite</i></button>&nbsp; {{ x.total_likes }}
-                                </form>
-                                <form action="{% url 'dislike_meme' x.pk %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" name="meme_id" value="{{ x.id }}" class="btn btn-link" id="dislike"><i class="material-icons">thumb_down</i></button>&nbsp; {{ x.total_dislikes }}
-                                </form>
-                            </div>
-                        </div>
-                        <p class="text-center text-">{{ x.caption }}</p>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar column for large screens -->
+        <div class="col-md-3 d-none d-lg-block d-xl-block">
+            <div class="sidebar border-3 sidebar-item" id="id_sidebar">
+                <!-- Sidebar content -->
+                <ul>
+                    <a href="/" class="nav-link pt-2"><button class="btn" id="sidebarId"><h5>Home</h5></button></a>
+                    <a href="#" class="nav-link pt-2"><button class="btn" id="sidebarId"><h5>Explore</h5></button></a>
+                    <a href="{% url 'following' %}"class="nav-link pt-2"><button class="btn" id="sidebarId"><h5>Following</h5></button></a>
+                    <a href="{% url 'about' %}" class="nav-link pt-2"><button class="btn" id="sidebarId"><h5>About</h5></button></a>
+                    <a href="#discover" data-bs-toggle="collapse" class="nav-link pt-2 collapsed"><button class="btn" id="sidebarId"><h5>Discover</h5></button></a>
+                    <div class="collapse" id="discover">
+                        <ul>
+                            <li>
+                                <h6>Work With US:<a href="mailto:omwagawilfred@gmail.com" class="text-info">Email Us<a>
+                                </h6>
+                            </li>
+                            <li>
+                                <h6><a href="{% url 'blogs' %}" class="" target="_blank">TrendWave-blogs</a></h6>
+                            </li>
+                        </ul>
                     </div>
-                </div>
-                {% endfor %}
+                    <br></br>
+                    <hr>
+                    <ul class="navbar-toggler">
+                        <div class="d-none d-lg-block d-xl-block">
+                            {% if user.is_authenticated %}
+                            {{ pass }}
+                            {% else %}
+                            <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-outline-danger" style="width: 50%;"><h4>Log in</h4></button></a>
+                            {% endif %}
+                        </div>
+                    </ul>
+                </ul>
+                <footer>
+                    <p style="color: blueviolet;">Join theTrendWave Community.Explore a world of creativity, entertainment, and discovery as you scroll through our curated selection of trending topics. From viral challenges to the hottest memes, TrendWave keeps you in the loop with what's capturing the internet's attention right <code>now.</code>
+                    </p>
+                </footer>
             </div>
         </div>
-    </form>
+        <!-- Main content column -->
+        <div class="col-lg-8">
+            <!-- Main content -->
+                <div class="row justify-content-center">
+                    <div class="col-md-7">
+                        <form action="">
+                            {% csrf_token %}
+                            <div class="row">
+                                {% for x in img %}
+                                <div class="col-12">
+                                    <div class="card mb-3">
+                                        <span class="block font-semibold card-text">
+                                            <div class="user-profile">
+                                                <a href="/profile/{{ x.user }}"><h4>@{{ x.user }}</h4></a>
+                                            </div>
+                                        </span>
+                                        <a href="{{ x.image.url }}" class="text-decoration-none"><img src="{{ x.image.url }}" alt=""
+                                                class="card-img-top img-fluid"></a>
+                                        <div class="card-footer align-items-center">
+                                            <div class="d-flex justify-content-between align-items-center w-100">
+                                                <div>
+                                                    <a href="{{ x.image.url}}" data-bs-toggle="modal"
+                                                        data-bs-target="#shareModal"><i class="material-icons">&#xe80d;</i></a>
+                                                    <a href="/like-image?x_id={{ x.id }}"><i
+                                                            class="material-icons">favorite</i></a>{{ x.likes }}
+                                                    <a href="{{ x.image.url}}" download="{{ x.image.url}}" id="download"><i
+                                                            class="material-icons">&#xe2c4;</i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="card-text">{{ x.caption }}</p>
+                                            <small class="text-muted">{{ x.date }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
 
+<br>
     <br>
     <div class="modal fade" id="shareModal">
         <div class="modal-dialog modal-sm">
@@ -161,6 +242,7 @@
 <br>
 {% endblock %}
 {% include "footer.html" %}
+</div>
 </body>
 <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

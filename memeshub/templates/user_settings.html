@@ -24,13 +24,13 @@
                 <p></p>
             </div>
             <div class="bg-white rounded-md lg:shadow-lg shadow col-span-2">
-                <form action="" method="post">
+                <form action="user_settings" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                 <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
                     <div>
                     <div class="col-span-2">
                         <label for="profile_image" class="form-label">Profile Image</label>
-                        <img src="{{user_profile.profileimg.url}}" alt="">
+                        <img src="{{ user_profile.profileimg.url }}" width="150px" height="150px" class="rounded-circle" alt="">
                         <input type="file" name="image" value="{{ user_profile.profileimg }}" class="form-control bg-gray-100">
                     </div>
                     <div class="col-span-2">
@@ -41,7 +41,7 @@
                     </div>
                     <div class="col-span-2">
                         <label for="location" class="form-label"> Location</label>
-                        <input type="text" value="{{ user_profile.location }}" class="form-control bg-gray-100">
+                        <input type="text" name="location" value="{{ user_profile.location }}" class="form-control bg-gray-100">
                     </div>
                 </div>
 
@@ -55,23 +55,6 @@
 
     </div>
 
-    </div>
-
-    </div>
-
-
-
-
-    <!-- Scripts
-        ================================================== -->
-    <script src="{% static 'assets/js/tippy.all.min.js' %}"></script>
-    <script src="{% static 'assets/js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'assets/js/uikit.js' %}"></script>
-    <script src="{% static 'assets/js/simplebar.js' %}"></script>
-    <script src="{% static 'assets/js/custom.js' %}"></script>
-
-
-    <script src="{% static '../../unpkg.com/ionicons%405.2.3/dist/ionicons.js' %}"></script>
 </body>
 
 </html>

@@ -15,3 +15,10 @@ Disallow: /public/
 
 User-agent: *
 Allow: /
+Allow: /about
+
+User-agent: Mediapartners-Google 
+Disallow:
+
+User-agent: *
+Disallow: /code/

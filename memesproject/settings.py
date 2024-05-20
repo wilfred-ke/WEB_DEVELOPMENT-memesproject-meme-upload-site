@@ -61,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'memeshub.middleware.RestrictAdminMiddleware',
+    'memeshub.custom_middleware.CustomHTMLMinifyMiddleware',
 ]
 
 ROOT_URLCONF = 'memesproject.urls'
@@ -151,3 +152,5 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = 'signIn'

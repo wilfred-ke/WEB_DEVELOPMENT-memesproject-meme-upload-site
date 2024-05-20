@@ -6,14 +6,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <script src="jquery-3.7.0.min.js"></script>
-    <title>memeshub.social</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <title>TrendWave-Ride the Wave of Trends</title>
 </head>
 <style>
     .offcanvas-body a {
@@ -57,77 +56,105 @@
         width: 100%;
         margin: 0;
     }
-  
+    .modal {
+    z-index: 1050; /* Ensure modal appears above other elements */
+    }
+    .modal-backdrop {
+    display: none; /* Hide the backdrop to allow interaction with elements behind the modal */
+    }
+    .navbar-brand h1, h2, h3{
+            font-family: 'Bree Serif', serif;
+            color: #333; 
+    }
+    /* CSS for desktop screens */
+    @media (min-width: 992px) {
+    .navbar hr {
+        display: block; /* Show the line */
+    }
+    #toggler_icon{
+        display: none;
+    }
+   }
+   /* CSS for smaller screens */
+   @media (max-width: 991px) {
+    .navbar hr {
+        display: none; /* Hide the line */
+    }
+    #toggler_icon{
+        display: block;
+    }
+   }
 </style>
 
 <body>
     {% block content %}
-    <div class="navbar navbar-expand-sm bg-dark  navabr-dark fixed-top py-0">
+    <div class="navbar navbar-expand-sm bg-light  navabr-light fixed-top py-0" id="navId" >
         <div class="container-fluid">
-            <a href="#canvas1"><button type="button" class="btn btn-secondary bg-light" data-bs-target="#canvas1"
-                    data-bs-toggle="offcanvas"><span class="navbar-toggler-icon"></span>
-                </button></a>
-            <a href="{% url 'homepage' %}" class="text-decoration-none"><h6 class="d-block d-sm-none"><span style="color: gold;">Memes</span><kbd
-                    style="background-color: black;">hub</kbd></h6></a>
-            <a href="{% url 'homepage' %}" class="text-decoration-none"><h5 class="d-none d-sm-block d-md-none"><span style="color: gold;">Memes</span><kbd style="background-color: black;">hub</kbd></h5></a>
-            <a href="{% url 'homepage' %}" class="navbar-brand d-none d-sm-block d-sm-none  d-md-block">
-                <h1>
-                    <span style="color: gold;">Memes</span><kbd style="background-color: black;">hub</kbd>
-                </h1>
-            </a>
+            <a href="#canvas1" data-bs-target="#canvas1" data-bs-toggle="offcanvas" class="text-decoration-none text-dark" id="toggler_icon"><span class="navbar-toggler-icon"></span></a>
+            <a href="{% url 'homepage' %}" class="navbar-brand d-none d-sm-block d-sm-none d-md-block">
+            <h1>TrendWave</h1></a>
+            <a href="{% url 'homepage' %}" class="navbar-brand d-block d-sm-none"><h3>TrendWave</h3></a>
+            <a href="{% url 'homepage' %}" class="navbar-brand d-none d-sm-block d-md-none"><h3>TrendWave</h3></a>
             <br>
             <!--for small devices-->
-            <button type="button" id="searchBtn" class="bg-dark border-0 d-block d-sm-none" onclick="showForm()">
-                <i class="material-icons align-self-center" style="color: goldenrod;">&#xe8b6;</i></span></button>
-            <br>    
+            <button type="button" id="searchBtn" class="border-0 d-block d-sm-none" onclick="showForm()">
+                <i class="material-icons align-self-center" style="color: rgb(17, 17, 15);">&#xe8b6;</i></span></button>
+            {% if user.is_authenticated %}
+            {{ pass }}
+            {% else %}    
+            <div class="border-0 d-block d-sm-none">
+                <a href="{% url 'signIn' %}" class="nav-link">
+                    <button class="btn btn-danger" style="width: 100px;">
+                        Log in
+                    </button></a>
+            </div>
+            {% endif %}
+            <br>  
+            <!--for large devices i.e desktop, computer etc -->  
             <form action="{% url 'homepage' %}" class="d-flex d-none d-sm-none d-md-block" method="get">
                 {% csrf_token %}
-                <input type="text" name="q" placeholder="Search.." id="inputBox" class="form-control-sm form-control-borderless">
-                <button type="submit" class="btn btn-sm btn-secondary"><i class="material-icon" style="color: goldenrod;">search</i></button>
+                <div class="input-group" style="width: 400px;">
+                    <input type="text" name="q" placeholder="Search TrendWave..." id="inputBox"
+                        class="form-control form-control-sm rounded-start" style="border-radius: 20px 0 0 20px;" required>
+                    <button type="submit" class="btn btn-sm btn-secondary rounded-end" style="border-radius: 0 20px 20px 0;">
+                        <i class="material-icon" style="color: goldenrod;">search</i>
+                    </button>
+                </div>
             </form>
             <br>
             <!--for medium devices-->
-            <form action="{% url 'homepage' %}" class="d-flex d-none d-sm-block d-md-none justify-content-center" method="get" id="myOtherForm">
+            <form action="{% url 'homepage' %}" class="d-flex d-none d-sm-block d-md-none justify-content-center" method="get"
+                id="myOtherForm">
                 {% csrf_token %}
-                <input type="text" name="q" placeholder="Search.." id="inputBox" class="form-control-sm form-control-borderless">
-                <button type="submit" class="btn btn-sm btn-secondary"><i class="material-icon"
-                        style="color: goldenrod;">search</i></button>
+                <div class="input-group" style="width: 400px;">
+                    <input type="text" name="q" placeholder="Search TrendWave..." id="inputBox"
+                        class="form-control form-control-sm rounded-start" style="border-radius: 20px 0 0 20px;" required>
+                    <button type="submit" class="btn btn-sm btn-secondary rounded-end" style="border-radius: 0 20px 20px 0;">
+                        <i class="material-icon" style="color: rgb(252, 186, 19);">search</i>
+                    </button>
+                </div>
             </form>
-            <button id="searchBtn2" class="bg-dark border-0 d-none d-sm-block d-md-none" onclick="searchHere()">
-                <i class="material-icons align-self-center" style="color: goldenrod;">&#xe8b6;</i></span></button>
+            <button id="searchBtn2" class="border-0 d-none d-sm-block d-md-none" onclick="searchHere()">
+                <i class="material-icons align-self-center" style="color: rgb(253, 188, 23);">&#xe8b6;</i></span></button>
             {% if user.is_authenticated %}
-            <div class="dropdown dropstart">
-                <span class="dropdown-toggle text-white" data-bs-toggle="dropdown">
-                    <i class="material-icons" style="font-size:36px">person_outline</i>
-                </span>
-                <ul class="dropdown-menu">
-                    <li class="input-group">
-                        <h2 class="dropdown-header input-grup-text">@{{ request.user.username }}</h2>
-                    </li>
-                    <hr>
-                    <a href="{% url 'signOut' %}" class="dropdown-item"><i class="material-icons">&#xe5c8;</i>Sign Out</a>
-                    <hr>
-                    <a href="{% url 'upload' %}" class="dropdown-item"><i class="material-icons">cloud_upload</i>Upload</a>
-                    <hr>
-                    <a href="{% url 'user_settings' %}" class="dropdown-item text-decoration-none">Settings</a>
-                    <hr>
-                </ul>
-            </div>
+            <button type="button" class="btn" data-bs-toggle="offcanvas" data-bs-target="#userCanvas">
+                <img src="{{ user_profile.profileimg.url }}" width="50px" height="50px" class="rounded-circle" alt="">
+            </button>
             {% else %}
             <div class="d-none d-sm-block d-sm-none  d-md-block">
-                <a href="{% url 'upload' %}" class="nav-link"><button class="btn btn-outline-warning">
-                        <i class="material-icons">cloud_upload</i>Upload</button></a>
+                <a href="{% url 'upload' %}" class="nav-link"><button class="btn btn-warning rounded-4" style="width: 150px;"><h5>+ Upload</h5></button></a>
             </div>
             <div class="d-none d-sm-block d-sm-none  d-md-block">
-                <a href="{% url 'signup' %}" class="nav-link"><button class="btn btn-outline-primary">Sign Up</button></a>
-            </div>
-            <div class="d-none d-sm-block d-sm-none  d-md-block">
-                <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-outline-success ">Sign In</button></a>
+                <a href="{% url 'signIn' %}" class="nav-link">
+                    <button class="btn btn-danger rounded-4" style="width: 150px;"><h5>Log in</h5></button></a>
             </div>
             {% endif %}
         </div>
-    </div></br><br>
-    <div id="welcome">
+        <hr style="margin: 0;">
+    </div>
+    </br>
+    <br>
+    <div id="welcome" class="mt-3">
          <ul class="nav bg-light justify-content-center pt-3 mx-auto align-items-center py-0" id="myList">
         {% for message in messages %}
         <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -137,83 +164,94 @@
             </button>
         </div>
         {% endfor %}
-        <form action="{% url 'homepage' %}" class="d-flex d-block d-sm-none justify-content-center" method="get" id="myform">
-            {% csrf_token %}
-            <input type="text" name="q" placeholder="Search.." id="inputBox" class="form-control-sm form-control-borderless">
-            <button type="submit" class="btn btn-sm btn-secondary"><i class="material-icon"
-                    style="color: goldenrod;">search</i></button>
-        </form>
+    <form action="{% url 'homepage' %}" class="d-flex d-block d-sm-none justify-content-center pt-3 mt-5" method="get" id="myform">
+        {% csrf_token %}
+        <div class="input-group" style="width: 300px;">
+            <input type="text" name="q" placeholder="Search TrendWave..." id="inputBox"
+                class="form-control form-control-sm rounded-start" style="border-radius: 20px 0 0 20px;" required>
+            <button type="submit" class="btn btn-sm btn-secondary rounded-end" style="border-radius: 0 20px 20px 0;">
+                <i class="material-icon" style="color: goldenrod;">search</i>
+            </button>
+        </div>
+    </form>
     </ul>
     </div>
     <br>
+    <!--offcanvas for pages -->
+    <div class="offcanvas-container">
     <div class="offcanvas offcanvas-start" id="canvas1">
         <div class="offcanvas-header">
-            <h2 class="offcanvas-title">Memes<kbd style="background-color: black;">hub</kbd></h2>
+            <h2 class="offcanvas-title">TrendWave</h2>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
             <ul>
-                <a href="">Home</a>
-                <hr>
-                <a href="#feedbackCollapse" data-bs-toggle="collapse">Feedback</a>
-                <div class="collapse" id="feedbackCollapse">
-                    sends us feedback via <a href="mailto:smemeshub@gmail.com"
-                        class="text-success">smemeshub@gmail.com</a>
-                </div>
-                <hr>
-                <a href="#support" data-bs-toggle="collapse">Contact Support</a>
+                <a href="/" class="nav-link pt-2"><button class="btn">
+                <h5>Home</h5></button></a>
+                <a href="#" class="nav-link pt-2"><button class="btn">
+                <h5>Explore</h5></button></a>
+                <a href="{% url 'following' %}" class="nav-link pt-2"><button class="btn">
+                <h5>Following</h5></button></a>   
                 <div class="collapse" id="support">
-                    <p>For any queries contact us via <a href="mailto:smemeshub@gmail.com" class="text-info">smemehub@gmail.com</a></p>
-                </div>
-                <hr>
-                <a href="{% url 'about' %}">About</a>
-                <hr>
-                    <a href="#discover" data-bs-toggle="collapse">Discover</a>
-                        <div class="collapse" id="discover">
+                <p>For any queries contact us via <a href="mailto:smemeshub@gmail.com" class="text-info">smemehub@gmail.com</a></p></div>
+                <a href="{% url 'about' %}" class="nav-link pt-2"><button class="btn">
+                <h5>About</h5></button></a>
+                <a href="#discover" data-bs-toggle="collapse" class="nav-link pt-2"><button class="btn">
+                <h5>Discover</h5></button></a>  
+                <div class="collapse" id="discover">
                             <ul>
                                 <li>
-                                <h6>Work with Me:<a href="mailto:omwagawilfred@gmail.com" class="text-info">Email Me<a><h6>
+                                <h6>Work with US:<a href="mailto:omwagawilfred@gmail.com" class="text-info">Email Me<a><h6>
                                 </li>
-                                <li><h6><a href="{% url 'blogs' %}" class="" target="_blank">memeshub-blogs</a></h6></li>
+                                <li><h6><a href="{% url 'blogs' %}" class="" target="_blank">memehub-blogs</a></h6></li>
                             </ul>
-                        </div>
+                </div>       
                 <ul class="navbar-toggler">
                     <hr>
                     <div class="d-block d-sm-none">
                         {% if user.is_authenticated %}
                         {{ pass}}
                         {% else %}
-                        <a href="{% url 'upload' %}" class="nav-link"><button class="btn btn-outline-warning" style="width: 100%;">
-                                <i class="material-icons">cloud_upload</i>Upload</button></a>
+                        <a href="{% url 'upload' %}" class="nav-link"><button class="btn btn-warning" style="width: 100%;"><h4>+ Upload</h4></button></a>
                         <hr>
-                        <a href="{% url 'signup' %}" class="nav-link"><button class="btn btn-outline-primary"
-                                style="width: 100%;">Sign
-                                Up</button></a>
-                        <hr>
-                        <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-outline-success"
-                                style="width: 100%;">Sign
-                                In</button></a>
+                        <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-danger"
+                        style="width: 100%;"><h4>Log in</h4></button></a>
                         {% endif %}
                     </div>
-                    <hr>
                     <div class="d-none d-sm-block d-md-none">
                         {% if user.is_authenticated %}
                         {{ pass }}
                         {% else %}
-                        <a href="{% url 'upload' %}" class="nav-link"><button class="btn btn-outline-warning" style="width: 100%;">
-                                <i class="material-icons">cloud_upload</i>Upload</button></a>
+                        <a href="{% url 'upload' %}" class="nav-link"><button class="btn btn-warning" style="width: 100%;"><h4>+ Upload</h4></button></a>
                         <hr>
-                        <a href="{% url 'signup' %}" class="nav-link"><button class="btn btn-outline-primary"
-                                style="width: 100%;">Sign
-                                Up</button></a>
-                        <hr>
-                        <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-outline-success"
-                                style="width: 100%;">Sign
-                                In</button></a>
+                        <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-danger" style="width: 100%;"><h4>Log in</h4></button></a>
                         {% endif %}
                     </div>
                 </ul>
             </ul>
+        </div>
+        <div class="offcanvas-footer">
+            <p style="color: blueviolet;">Join theTrendWave Community. Explore a world of creativity, entertainment, and discovery as you scroll through our curated selection of trending topics. From viral challenges to the hottest memes, TrendWave keeps you in the loop with what's capturing the internet's attention right <code>now.</code></p>
+        </div>
+    </div>
+    </div>
+    <!--user requests offcanvas for user_profile -->
+    <div class="offcanvas offcanvas-start" id="userCanvas">
+        <div class="offcanvas-header">
+            <h3 class="offcanvas-title text-center">@{{ request.user.username }}</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body bg-light">
+            <div class="d-grid gap-2">
+                <a href="{% url 'signOut' %}" class="nav-link pt-2"><button class="btn text-muted"><h6>Logout</h6></button></a>
+                <a href="{% url 'upload' %}" class="nav-link pt-2"><button class="btn text-muted"><h6>+ Upload</h6></button><a>
+                {% if request.user.username %}
+                <a href="{% url 'profile' user_profile.user.username %}" class="nav-link pt-2"><button class="btn text-muted"><h6>Profile</h6></button></a>
+                {% endif %}  
+            </div>
+        </div>
+        <div class="offcanvas-footer">
+            <button type="button" class="btn btn-danger float-end" style="width: 30%;" data-bs-dismiss="offcanvas">Close</button>
         </div>
     </div>
     {% endblock %}
@@ -221,12 +259,18 @@
 <script>
     var a;
     let searchForm = document.querySelector('#myform');
+    let body_content = document.querySelector('#contentId');
+    let navbarId = document.querySelector('#navId');
+    let following_content = document.querySelector("#following")
     function showForm(){
         if(a==1){
             searchForm.style.visibility = 'visible';
+            body_content.style.visibility = 'hidden';
+            navbarId.style.visibility = 'visible';
             return a=0;
         }else{
             searchForm.style.visibility = 'hidden';
+            body_content.style.visibility = 'visible';
             return a=1;
         }
     }

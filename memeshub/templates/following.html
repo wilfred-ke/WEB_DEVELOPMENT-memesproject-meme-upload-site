@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="users you're following posts">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
+    <title>account/user_following</title>
+</head>
+<style>
+    a{
+        text-decoration: none;
+    }
+</style>
+<body id="contentId">
+    {% block content %}
+    {% include 'base.html' %}
+    <br>
+    <div class="container-fluid" id="following">
+            <div class="row justify-content-center">
+                <div class="col-6 col-md-7">
+                    <h4 class="text-muted">Following</h4>
+                    <form action="">
+                        {% csrf_token %}
+                        <div class="row">
+                            {% if feed_list %}
+                            {% for x in feed_list %}
+                            <div class="col-12">
+                                <div class="card mb-3">
+                                    <span class="block font-semibold card-text">
+                                        <div class="user-profile">
+                                            <a href="/profile/{{ x.user }}" class="text-decoration-none">
+                                                <h4>@{{ x.user }}</h4>
+                                            </a>
+                                        </div>
+                                    </span>
+                                    <a href="{{ x.image.url }}" class="text-decoration-none">
+                                        <img src="{{ x.image.url }}" alt="" class="card-img-top img-fluid">
+                                    </a>
+                                    <div class="card-footer align-items-center">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <div>
+                                                <a href="{{ x.image.url}}" data-bs-toggle="modal" data-bs-target="#shareModal">
+                                                    <i class="material-icons">&#xe80d;</i>
+                                                </a>
+                                                <a href="/like-image?x_id={{ x.id }}">
+                                                    <i class="material-icons">favorite</i>
+                                                </a>{{ x.likes }}
+                                                <a href="{{ x.image.url}}" download="{{ x.image.url}}" id="download">
+                                                    <i class="material-icons">&#xe2c4;</i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ x.caption }}</p>
+                                        <small class="text-muted">{{ x.date }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <div class="col-12">
+                                <div class="alert alert-warning" role="alert">
+                                    You are not following anyone. Users you follow will be shown here.
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-6 col-md-3 bg-seondary">
+                    <div class="">
+                        <h4 class="text-muted">Users You Can Follow</h4>
+                    </div>
+                    <div class="container">
+                        {% for suggestion in suggestions_username_profile_list %}
+                        <div class="row align-items-center mb-3">
+                            <div class="col-auto">
+                                <a href="/profile/{{ suggestion.user }}">
+                                    <img src="{{ suggestion.profileimg.url }}" class="rounded-circle" width="50px" height="50px" alt="user_suggestion_images">
+                                </a>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex flex-column">
+                                    <span class="block capitalize font-semibold">{{ suggestion.user }}</span>
+                                    <span class="block text-muted">{{ suggestion.bio }}</span>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <a href="/profile/{{ suggestion.user }}" class="btn btn-outline-danger">View User</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+    </div>
+    {% endblock %}
+</body>
+<script>
+</script>
+</html>

@@ -1,8 +1,12 @@
 from django.contrib import admin
-from .models import Image, Profile
+from .models import Image, LikeImage, TheProfile, FollowersCount
 
 admin.site.register(Image)
-admin.site.register(Profile)
+admin.site.register(LikeImage)
+admin.site.register(TheProfile)
+admin.site.register(FollowersCount)
 
-class ImageAdmin(admin.ModelAdmin):
-    list_display = ['id', 'photo', 'date','caption']
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['id', 'image', 'date','caption']
+    date_hierarchy = 'date'
+    search_fields = ['user', 'caption', 'date']

@@ -1,7 +1,4 @@
-# middleware.py
-
 from django.shortcuts import redirect
-
 
 class RestrictAdminMiddleware:
     def __init__(self, get_response):
@@ -12,3 +9,5 @@ class RestrictAdminMiddleware:
             # Redirect non-admin users to the home page
             return redirect('homepage')
         return self.get_response(request)
+
+
