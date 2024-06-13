@@ -1,0 +1,302 @@
+.offcanvas-body a {
+    text-decoration: none;
+}
+
+div.text-white {
+    padding: 100px 20px;
+}
+
+form input.form-control-borderless:active {
+    box-shadow: inset;
+}
+
+form input.form-control-borderless:hover {
+    border: #333;
+    outline: auto;
+    box-shadow: 2px;
+}
+
+form input.form-control-borderless:focus {
+    border: saddlebrown;
+    outline: auto;
+    box-shadow: none;
+}
+
+#searchBtn {
+    align-items: center;
+    width: auto;
+    height: 30px;
+}
+
+form#myform {
+    visibility: hidden;
+    position: fixed;
+}
+
+form#myOtherForm {
+    visibility: hidden;
+}
+
+div#welcome {
+    position: sticky;
+    padding-bottom: 2px;
+}
+
+ul#myList {
+    padding-bottom: 2px;
+    width: 100%;
+    margin: 0;
+}
+
+.modal {
+    z-index: 1050;
+    /* Ensure modal appears above other elements */
+}
+
+.modal-backdrop {
+    display: none;
+    /* Hide the backdrop to allow interaction with elements behind the modal */
+}
+
+.navbar-brand h1,
+h2,
+h3 {
+    font-family: 'Bree Serif', serif;
+    color: #333;
+}
+
+/* CSS for desktop screens */
+@media (min-width: 992px) {
+    .navbar hr {
+        display: block;
+        /* Show the line */
+    }
+
+    #toggler_icon {
+        display: none;
+    }
+}
+
+/* CSS for smaller screens */
+@media (max-width: 991px) {
+    .navbar hr {
+        display: none;
+        /* Hide the line */
+    }
+
+    #toggler_icon {
+        display: block;
+    }
+}
+
+.modal-header,
+.modal-footer {
+    border: none;
+}
+
+.dark-theme {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.light-theme {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Additional styles to ensure content visibility in dark mode */
+.dark-theme .card,
+.dark-theme .modal-content {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+.dark-theme .offcanvas-header {
+    background-color: #555454;
+    color: #f8f5f5;
+}
+
+.dark-theme .sidebar-item {
+    background-color: #1e1e1e;
+    color: #ffff;
+}
+
+.dark-theme h5 {
+    color: #ffffff;
+}
+
+.dark-theme h6 {
+    color: rgb(199, 197, 197);
+}
+
+.dark-theme #userSection a i {
+    color: rgb(173, 170, 170);
+    ;
+}
+
+.dark-theme .user-profile {
+    color: #ffffff;
+}
+
+.dark-theme .sidebar-item:hover {
+    color: rgb(17, 17, 17);
+}
+
+.dark-theme .offcanvas-body {
+    background-color: #333;
+}
+
+.dark-theme .nav-link:hover {
+    background-color: #000000;
+}
+
+.dark-theme .user-name {
+    color: #ffffff;
+}
+
+.light-theme .user-name {
+    color: #000000;
+}
+
+.dark-theme #download {
+    color: rgb(173, 170, 170);
+}
+
+.light-theme #download {
+    color: #333;
+}
+
+.dark-theme .comments {
+    color: rgb(173, 170, 170);
+}
+
+.light-theme .comments {
+    color: #1e1e1e;
+}
+
+.dark-theme .like-button {
+    color: aliceblue;
+}
+
+.light-theme .like-button {
+    color: #000000;
+}
+
+.dark-theme .share-button {
+    color: rgb(173, 170, 170);
+}
+
+.light-theme .share-button {
+    color: #333;
+}
+
+.dark-theme .navbar {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.light-theme #navFooter {
+    background-color: rgb(158, 157, 157);
+}
+
+.light-theme .navbar {
+    background-color: #f8f5f5;
+}
+
+.dark-theme .navbar .navbar-brand h1 {
+    color: #ffffff;
+}
+
+.dark-theme .navbar .navbar-brand h3 {
+    color: #ffffff;
+}
+
+.dark-theme .modal-header {
+    color: #fff;
+}
+
+.dark-theme #small_brand {
+    color: #ffffff;
+}
+
+.dark-theme .navbar#toggleBtn {
+    color: #f8f5f5;
+    border: 0;
+}
+
+.dark-theme #theme-button {
+    background-color: #000000;
+    color: #fff;
+}
+
+.light-theme #theme-button {
+    background-color: #f8f5f5;
+}
+
+.dark-theme #searchBtn {
+    color: gold;
+}
+
+.light-theme #searchBtn {
+    color: #000000;
+}
+
+.dark-theme #searchBtn2 {
+    background-color: #000000;
+    color: #f8f5f5;
+}
+
+.dark-theme .card-body #posted-date {
+    color: rgb(173, 170, 170);
+}
+
+.dark-theme .list-group-item {
+    background-color: rgb(19, 15, 15);
+    color: rgb(173, 170, 170);
+    border: 0;
+}
+
+.light-theme .card-body #user_caption {
+    color: rgb(19, 15, 15);
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+.dark-theme .form-group {
+    background-color: rgb(19, 15, 15);
+}
+
+.dark-theme .following_page {
+    background-color: #1e1e1e;
+}
+
+.dark-theme h4#users_following {
+    color: rgb(185, 182, 182);
+}
+
+.dark-theme h4#users_follow {
+    color: #c5c3c3;
+}
+
+.light-theme h4#users_following {
+    color: rgb(173, 170, 170);
+}
+
+.light-theme h4#users_follow {
+    color: rgb(173, 170, 170);
+}
+
+.dark-theme h4#user_name {
+    color: rgb(173, 170, 170);
+}
+
+.light-theme h4#user_name {
+    color: #000000;
+}
+
+.dark-theme #user_following_caption {
+    color: rgb(173, 170, 170);
+}
+
+.dark-theme .user_post_date {
+    color: rgb(173, 170, 170);
+}

@@ -1,5 +1,6 @@
-<!DOCTYPE html>
 {% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,8 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
     <title>account/user_following</title>
@@ -18,57 +18,115 @@
         text-decoration: none;
     }
 </style>
-<body id="contentId">
+<body id="contentId" class="following_page">
     {% block content %}
     {% include 'base.html' %}
     <br>
     <div class="container-fluid" id="following">
             <div class="row justify-content-center">
                 <div class="col-6 col-md-7">
-                    <h4 class="text-muted">Following</h4>
+                    <h4 id="users_following">Following</h4>
                     <form action="">
                         {% csrf_token %}
-                        <div class="row">
+                        <div class="row d-flex ">
                             {% if feed_list %}
                             {% for x in feed_list %}
-                            <div class="col-12">
+                            <div class="col-12 d-none d-sm-none d-md-block d-lg-block">
                                 <div class="card mb-3">
-                                    <span class="block font-semibold card-text">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        {% if x.user.theprofile.profileimg %}
                                         <div class="user-profile">
-                                            <a href="/profile/{{ x.user }}" class="text-decoration-none">
-                                                <h4>@{{ x.user }}</h4>
-                                            </a>
+                                            <div class="card-header d-flex align-items-center">
+                                                <div class="user-profile me-2">
+                                                    <a href="/profile/{{ x.user.username }}">
+                                                        <img src="{{ x.user.theprofile.profileimg.url }}" class="rounded-circle" width="60px"
+                                                            height="60px" alt="user_profile_pic">
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    <a href="/profile/{{ x.user.username }}" class="text-decoration-none user-name">
+                                                        <h3 class="mb-0">@{{ x.user.username }}</h3>
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </span>
-                                    <a href="{{ x.image.url }}" class="text-decoration-none">
-                                        <img src="{{ x.image.url }}" alt="" class="card-img-top img-fluid">
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'image_detail' x.id %}" class="text-decoration-none">
+                                        {% if x.file.url|is_image %}
+                                        <img src="{{ x.file.url }}" alt="" class="card-img-top img-fluid" style="height: 450px;">
+                                        {% elif x.file.url|is_video %}
+                                        <video class="card-img-top img-fluid" controls preload="metadata" aria-describedby="video-description">
+                                            <source src="{{ x.file.url }}" type="video/mp4">
+                                            <source src="{{ x.file.url }}" type="video/webm">
+                                            <source src="{{ x.file.url }}" type="video/ogg">
+                                            Your browser does not support the video tag.
+                                            <track label="English" kind="captions" srclang="en" default>
+                                            <track label="Spanish" kind="captions" srclang="es">
+                                        </video>
+                                        <!--<div id="video-description" class="sr-only">
+                                        This is a description of the video content. Provide a brief summary of the video's key points and content here.
+                                        </div>-->
+                                        {% endif %}
                                     </a>
                                     <div class="card-footer align-items-center">
                                         <div class="d-flex justify-content-between align-items-center w-100">
                                             <div>
-                                                <a href="{{ x.image.url}}" data-bs-toggle="modal" data-bs-target="#shareModal">
+                                                <a href="{{ x.file.url }}" data-bs-toggle="modal" data-bs-target="#shareModal"
+                                                    class="share-button text-decoration-none">
                                                     <i class="material-icons">&#xe80d;</i>
                                                 </a>
-                                                <a href="/like-image?x_id={{ x.id }}">
-                                                    <i class="material-icons">favorite</i>
-                                                </a>{{ x.likes }}
-                                                <a href="{{ x.image.url}}" download="{{ x.image.url}}" id="download">
+                                                <div class="d-inline-flex align-items-center">
+                                                    <a href="/like-image?x_id={{ x.id }}&next={{ request.path }}#file-{{ x.id }}"
+                                                        class="text-decoration-none d-flex align-items-center like-button" data-file-id="{{ x.id }}"
+                                                        data-likes="{{ x.likes }}">
+                                                        <i
+                                                            class="material-icons {% if like_filter == username %}liked{% else %}not-liked{% endif %}">favorite</i>
+                                                        <span class="ms-1">{{ x.likes }}</span>
+                                                    </a>
+                                                </div>
+                                                <a href="{{ x.file.url }}" download="{{ x.file.url }}" id="download">
                                                     <i class="material-icons">&#xe2c4;</i>
+                                                </a>
+                                            </div>
+                                            <div class="float-start">
+                                                <a href="{% url 'image_detail' x.id %}" class="btn btn-link p-0 comments">
+                                                    <i class="material-icons" style="font-size:36px">comment</i>
                                                 </a>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-text">{{ x.caption }}</p>
-                                        <small class="text-muted">{{ x.date }}</small>
+                                        <p class="card-text" id="user_caption">{{ x.caption }}</p>
+                                        <small class="" id="posted-date">{{ x.date }}</small>
                                     </div>
                                 </div>
                             </div>
+                            {% if x.user.theprofile.profileimg %}
+                            <div class="col-12 d-sm-block d-md-none d-lg-none">
+                                <div class="row align-items-center mb-3">
+                                    <div class="col-auto">
+                                        <a href="/profile/{{ x.user.username }}">
+                                            <img src="{{ x.user.theprofile.profileimg.url }}" class="rounded-circle" width="50px" height="50px"
+                                                alt="user_following_profile">
+                                        </a>
+                                    </div>
+                                    <div class="col">
+                                        <div class="d-flex flex-column">
+                                            <span class="block capitalize font-semibold">@{{ x.user.username }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <a href="/profile/{{ x.user.username }}" class="btn btn-outline-success">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
                             {% endfor %}
                             {% else %}
                             <div class="col-12">
                                 <div class="alert alert-warning" role="alert">
-                                    You are not following anyone. Users you follow will be shown here.
+                                    <p>You are not following anyone. Users you follow will be shown here.</p>
                                 </div>
                             </div>
                             {% endif %}
@@ -78,20 +136,19 @@
 
                 <div class="col-6 col-md-3 bg-seondary">
                     <div class="">
-                        <h4 class="text-muted">Users You Can Follow</h4>
+                        <h4 id="users_follow">Users You Can Follow</h4>
                     </div>
                     <div class="container">
                         {% for suggestion in suggestions_username_profile_list %}
                         <div class="row align-items-center mb-3">
                             <div class="col-auto">
                                 <a href="/profile/{{ suggestion.user }}">
-                                    <img src="{{ suggestion.profileimg.url }}" class="rounded-circle" width="50px" height="50px" alt="user_suggestion_images">
+                                    <img src="{{ suggestion.profileimg.url }}" class="rounded-circle" width="50px" height="50px" alt="user_suggestion_profile">
                                 </a>
                             </div>
                             <div class="col">
                                 <div class="d-flex flex-column">
                                     <span class="block capitalize font-semibold">{{ suggestion.user }}</span>
-                                    <span class="block text-muted">{{ suggestion.bio }}</span>
                                 </div>
                             </div>
                             <div class="col-auto">
@@ -103,8 +160,15 @@
                 </div>
             </div>
     </div>
+    {% include "user_base.html" %}
     {% endblock %}
 </body>
 <script>
+    /*
+    <div class="card-body">
+                                        <p class="card-text" id="user_following_caption">{{ x.caption }}</p>
+                                        <small class="user_post_date">{{ x.date }}</small>
+                                    </div>
+    */
 </script>
 </html>

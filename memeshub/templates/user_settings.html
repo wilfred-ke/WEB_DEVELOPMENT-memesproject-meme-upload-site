@@ -10,10 +10,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <title>user_settings</title>
 </head>
 
 <body>
+    <div id="contentId">
     {% include "base.html" %}
     <div class="container m-auto">
         <h3 class="display-6 mt-3"> Account Setting for <b>{{ user.username }}</b> </h3>
@@ -26,35 +29,111 @@
             <div class="bg-white rounded-md lg:shadow-lg shadow col-span-2">
                 <form action="user_settings" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
-                    <div>
-                    <div class="col-span-2">
-                        <label for="profile_image" class="form-label">Profile Image</label>
-                        <img src="{{ user_profile.profileimg.url }}" width="150px" height="150px" class="rounded-circle" alt="">
-                        <input type="file" name="image" value="{{ user_profile.profileimg }}" class="form-control bg-gray-100">
+                    <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
+                        <div class="col-span-2 text-center">
+                            <a href="javascript:void(0);" onclick="toggleProfileOptions();">
+                                <img src="{{ user_profile.profileimg.url }}" width="150px" height="150px" class="rounded-circle"
+                                    alt="">
+                            </a>
+                            <input type="file" name="image" id="fileInput" value="{{ user_profile.profileimg }}"
+                                class="form-control bg-gray-100" style="display: none;" onchange="this.form.submit()">
+                        </div>
+            
+                        <!-- Profile Options Section -->
+                        <div id="profileOptions" style="display: none;" class="col-span-2 text-center">
+                            <button type="button" class="btn btn-secondary"
+                                onclick="document.getElementById('fileInput').click();">Change Profile</button>
+                            <button type="button" id="removeProfilePictureBtn" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeProfilePictureModal">Remove Profile</button>
+                        </div>
+                        <div class="col-span-2">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea id="bio" name="bio"
+                                class="form-control shadow-none bg-gray-100">{{ user_profile.bio }}</textarea>
+                        </div>
+                        <div class="col-span-2">
+                            <label for="location" class="form-label"> Location</label>
+                            <input type="text" name="location" value="{{ user_profile.location }}" class="form-control bg-gray-100">
+                        </div>
+                        <div class="col-span-2 mt-2 my-2 mx-2">
+                            <button type="button" class="btn btn-danger" id="deleteAccountBtn" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete Account</button>
+                        </div>
                     </div>
-                    <div class="col-span-2">
-                        <label for="bio" class="form-label">Bio</label>
-                        <textarea id="bio" name="bio" class="form-control shadow-none bg-gray-100">
-                            {{ user_profile.bio }}
-                        </textarea>
+            
+                    <div class="bg-gray-10 p-6 pt-0 flex justify-end space-x-3 mt-3 pt-3 float-end">
+                        <button class="btn btn-secondary btn-md bg-secondary">
+                            <a href="/" class="text-decoration-none text-light">Cancel</a>
+                        </button>
+                        <button type="submit" class="btn btn-info">Save</button>
                     </div>
-                    <div class="col-span-2">
-                        <label for="location" class="form-label"> Location</label>
-                        <input type="text" name="location" value="{{ user_profile.location }}" class="form-control bg-gray-100">
-                    </div>
-                </div>
-
-                <div class="bg-gray-10 p-6 pt-0 flex justify-end space-x-3 mt-3 pt-3 float-end">
-                    <button class="btn btn-secondary btn-md bg-secndary"> <a href="/" class="text-decoration-none text-light">Cancel</a> </button>
-                    <button type="submit" class="btn btn-info"> Save </button>
-                </div>
                 </form>
+                <!-- Delete Account Modal -->
+                <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteAccountModalLabel">Delete Account</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form id="deleteAccountForm" method="post" action="{% url 'delete_account' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete Account</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Remove Profile Picture Modal -->
+                <div class="modal fade" id="removeProfilePictureModal" tabindex="-1" aria-labelledby="removeProfilePictureModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="removeProfilePictureModalLabel">Remove Profile Picture</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to remove your profile picture? A default picture will be used instead.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form id="removeProfilePictureForm" method="post" action="{% url 'remove_profile_picture' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Remove</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
+    </div>
+<script>
+function toggleProfileOptions() {
+    var profileOptions = document.getElementById('profileOptions');
+    if (profileOptions.style.display === 'none') {
+        profileOptions.style.display = 'block';
+    } else {
+        profileOptions.style.display = 'none';
+    }
+    }
+document.addEventListener('DOMContentLoaded', function() {
+    //Delete account Modal
+    document.getElementById('deleteAccountBtn').addEventListener('click', function() {
+        new bootstrap.Modal(document.getElementById('deleteAccountModal')).show();
+    });
 
+    // Remove Profile Picture Modal
+    document.getElementById('removeProfilePictureBtn').addEventListener('click', function() {
+        new bootstrap.Modal(document.getElementById('removeProfilePictureModal')).show();
+    });
+    });    
+</script>
 </body>
-
 </html>

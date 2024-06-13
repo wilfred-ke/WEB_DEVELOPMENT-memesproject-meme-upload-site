@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 {% load social_share %}
 <!DOCTYPE html>
 <html lang="en">
@@ -19,35 +20,30 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <title>TrendWave - Ride the Wave of Trends</title>
 </head>
-<body>   
+<body class="dark-theme">   
 <div id="contentId">
 {% include "base.html" %}
 {% block content %}
 <br>
 <div id="one" class="carousel slide pt-2 d-block d-sm-none" data-bs-ride="carousel">
     <div class="carousel-indicators">
-        <button type="button" data-bs-target="#one" data-bs-slide-to="0" class="active bg-warning"></button>
-        <button type="button" data-bs-target="#one" data-bs-slide-to="1"></button>
-        <button type="button" data-bs-target="#one" data-bs-slide-to="2"></button>
-        <button type="button" data-bs-target="#one" data-bs-slide-to="3"></button>
-        <button type="button" data-bs-target="#one" data-bs-slide-to="4"></button>
+        {% for image in latest_images %}
+        <button type="button" data-bs-target="#one" data-bs-slide-to="{{ forloop.counter0 }}"
+         {% if forloop.first %} class="active bg-warning" {% endif %}></button>   
+        {% endfor %}
     </div>
-    <div class="carousel-inner pt-2" height="200px" width="200px">
-        <div class="carousel-item active">
-            <img src="{% static 'images/beauty.jpg' %}" alt="" class=" img-fluid" width="100%" height="15%">
+    <div class="carousel-inner pt-2 respnsive-iframe" height="200px" width="200px">
+        {% for image in latest_images %}
+        <div class="carousel-item{% if forloop.first %} active{% endif %}">
+            {% if image.file.url|is_image %}
+            <a href="{{ image.file.url}}" class="text-decoration-none img-fluid"><img src="{{ image.file.url }}" alt="" class="img-fluid" style="height: 400px; width: 100%;"></a>
+            <div class="carousel-caption">
+                <!--<h5>{{ image.caption }}</h5>-->
+                <h1 class="text-danger">Trending</h1>
+            </div>
+            {% endif %}
         </div>
-        <div class="carousel-item">
-            <img src="{% static 'images/pray.jpg' %}" alt="" class=" img-fluid" width="100%" height="15%">
-        </div>
-        <div class="carousel-item">
-            <img src="{% static 'images/life.jpg' %}" alt="" class="img-fluid" width="100%" height="15%">
-        </div>
-        <div class="carousel-item">
-            <img src="{% static 'images/single.jpg' %}" alt="" class="img-fluid" width="100%" height="15%">
-        </div>
-        <div class="carousel-item">
-            <img src="{% static 'images/lovememes.jpg' %}" alt="" class="img-fluid" width="100%" height="10%">
-        </div>
+        {% endfor %}
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#one" data-bs-slide="prev">
         <span class="carousel-control-prev-icon"></span>
@@ -56,77 +52,159 @@
         <span class="carousel-control-next-icon"></span>
     </button>
 </div>
+<br>
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar column for large screens -->
         <div class="col-md-3 d-none d-lg-block d-xl-block">
             <div class="sidebar border-3 sidebar-item" id="id_sidebar">
                 <!-- Sidebar content -->
-                <ul>
-                    <a href="/" class="nav-link pt-2 "><button class="btn" id="sidebarId"><h5>Home</h5></button></a>
-                    <a href="{% url 'explore' %}" class="nav-link pt-2" ><button class="btn" id="sidebarId"><h5>Explore</h5></button></a>
-                    <a href="{% url 'following' %}"class="nav-link pt-2"><button class="btn" id="sidebarId"><h5>Following</h5></button></a>
-                    <a href="{% url 'about' %}" class="nav-link pt-2"><button class="btn" id="sidebarId"><h5>About</h5></button></a>
-                    <a href="{% url 'discover' %}" class="nav-link pt-2"><button class="btn" id="sidebarId"><h5>Discover</h5></button></a>
-                    <br></br>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link d-flex align-items-center">
+                            <i class="material-icons me-2">&#xe88a;</i>
+                            <button class="btn" id="sidebarId"><h5>Home</h5></button>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'explore' %}" class="nav-link d-flex align-items-center">
+                            <i class="material-icons me-2">&#xe87a;</i>
+                            <button class="btn" id="sidebarId"><h5>Explore</h5></button>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'following' %}" class="nav-link d-flex align-items-center">
+                            <i class="material-icons me-2">&#xe7fe;</i>
+                            <button class="btn" id="sidebarId"><h5>Following</h5></button>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'about' %}" class="nav-link d-flex align-items-center">
+                            <i class="material-icons">&#xe02f;</i><button class="btn" id="sidebarId"><h5>About</h5></button>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'discover' %}" class="nav-link d-flex align-items-center">
+                            <i class="material-icons me-2">&#xe89e;</i>
+                            <button class="btn" id="sidebarId"><h5>Discover</h5></button>
+                        </a>
+                    </li>
+                    <br>
                     <hr>
-                    <ul class="navbar-toggler">
+                    <li class="nav-item">
                         <div class="d-none d-lg-block d-xl-block">
                             {% if user.is_authenticated %}
-                            {{ pass }}
+                            <!-- User-specific content goes here -->
                             {% else %}
-                            <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-outline-danger" style="width: 50%;"><h4>Log in</h4></button></a>
+                            <a href="{% url 'signIn' %}" class="nav-link d-flex justify-content-center">
+                                <button class="btn btn-outline-danger w-50">
+                                    <h4>Log in</h4>
+                                </button>
+                            </a>
                             {% endif %}
                         </div>
-                    </ul>
+                    </li>
                 </ul>
                 <footer>
-                    <p style="color: blueviolet;">Join theTrendWave Community.Explore a world of creativity, entertainment, and discovery as you scroll through our curated selection of trending topics. From viral challenges to the hottest memes, TrendWave keeps you in the loop with what's capturing the internet's attention right <code>now.</code>
+                    {% if user.is_authenticated %}
+                    <p style="color: blueviolet;">
+                        Welcome back to TrendWave! Keep exploring trending topics, join viral challenges, and enjoy the hottest memes. Your journey through the best of the internet continues right <code>here.</code>
                     </p>
+                    {% else %}
+                    <p style="color: blueviolet;">
+                        Join TrendWave! Explore creativity, entertainment, and trending topics. Stay in the loop with viral challenges and the hottest memes right <code>now.</code>
+                    </p>
+                    {% endif %}
                 </footer>
+                <!--<button class="text-center btn btn-info" id="inviteFriendBtn">
+                    <h5>Invite Friend</h5>
+                </button>-->
             </div>
         </div>
         <!-- Main content column -->
         <div class="col-lg-8">
-            <!-- Main content -->
-                <div class="row justify-content-center">
-                    <div class="col-md-7">
-                        <form action="">
-                            {% csrf_token %}
-                            <div class="row">
-                                {% for x in img %}
-                                <div class="col-12">
-                                    <div class="card mb-3">
-                                        <span class="block font-semibold card-text">
-                                            <div class="user-profile">
-                                                <a href="/profile/{{ x.user }}"><h4>@{{ x.user }}</h4></a>
-                                            </div>
-                                        </span>
-                                        <a href="{{ x.image.url }}" class="text-decoration-none"><img src="{{ x.image.url }}" alt=""
-                                                class="card-img-top img-fluid"></a>
-                                        <div class="card-footer align-items-center">
-                                            <div class="d-flex justify-content-between align-items-center w-100">
+            <div class="row justify-content-center">
+                <div class="col-md-7">
+                    <form action="" method='GET'>
+                        {% csrf_token %}
+                        <div class="row">
+                            {% for x in img %}
+                            <div id="file-{{ x.id }}" class="col-12 file-card">
+                                <div class="card mb-3">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        {% if x.user.theprofile.profileimg %}
+                                        <div class="user-profile">
+                                            <div class="card-header d-flex align-items-center">
+                                                <div class="user-profile me-2">
+                                                    <a href="/profile/{{ x.user.username }}">
+                                                        <img src="{{ x.user.theprofile.profileimg.url }}" class="rounded-circle" width="60px" height="60px"
+                                                            alt="user_profile_pic">
+                                                    </a>
+                                                </div>
                                                 <div>
-                                                    <a href="{{ x.image.url}}" data-bs-toggle="modal"
-                                                        data-bs-target="#shareModal"><i class="material-icons">&#xe80d;</i></a>
-                                                    <a href="/like-image?x_id={{ x.id }}"><i
-                                                            class="material-icons">favorite</i></a>{{ x.likes }}
-                                                    <a href="{{ x.image.url}}" download="{{ x.image.url}}" id="download"><i
-                                                            class="material-icons">&#xe2c4;</i></a>
+                                                    <a href="/profile/{{ x.user.username }}" class="text-decoration-none user-name">
+                                                        <h3 class="mb-0">@{{ x.user.username }}</h3>
+                                                    </a>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card-body">
-                                            <p class="card-text">{{ x.caption }}</p>
-                                            <small class="text-muted">{{ x.date }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'image_detail' x.id %}" class="text-decoration-none">
+                                        {% if x.file.url|is_image %}
+                                        <img src="{{ x.file.url }}" alt="" class="card-img-top img-fluid" style="height: 400px;">
+                                        {% elif x.file.url|is_video %}
+                                        <video class="card-img-top img-fluid" controls preload="metadata" aria-describedby="video-description">
+                                            <source src="{{ x.file.url }}" type="video/mp4">
+                                            <source src="{{ x.file.url }}" type="video/webm">
+                                            <source src="{{ x.file.url }}" type="video/ogg">
+                                            Your browser does not support the video tag.
+                                            <track label="English" kind="captions" srclang="en" default>
+                                            <track label="Spanish" kind="captions" srclang="es">
+                                        </video>
+                                        <!--<div id="video-description" class="sr-only">
+                                            This is a description of the video content. Provide a brief summary of the video's key points and content here.
+                                        </div>-->
+                                        {% endif %}
+                                    </a>
+                                    <div class="card-footer align-items-center">
+                                        <div class="d-flex justify-content-between align-items-center w-100">
+                                            <div>
+                                                <a href="{{ x.file.url }}" data-bs-toggle="modal" data-bs-target="#shareModal"
+                                                    class="share-button text-decoration-none">
+                                                    <i class="material-icons">&#xe80d;</i>
+                                                </a>
+                                                <div class="d-inline-flex align-items-center">
+                                                    <a href="/like-image?x_id={{ x.id }}&next={{ request.path }}#file-{{ x.id }}"
+                                                        class="text-decoration-none d-flex align-items-center like-button"
+                                                        data-file-id="{{ x.id }}" data-likes="{{ x.likes }}">
+                                                        <i
+                                                            class="material-icons {% if like_filter == username %}liked{% else %}not-liked{% endif %}">favorite</i>
+                                                        <span class="ms-1">{{ x.likes }}</span>
+                                                    </a>
+                                                </div>
+                                                <a href="{{ x.file.url }}" download="{{ x.file.url }}" id="download">
+                                                    <i class="material-icons">&#xe2c4;</i>
+                                                </a>
+                                            </div>
+                                            <div class="float-start">
+                                                <a href="{% url 'image_detail' x.id %}" class="btn btn-link p-0 comments">
+                                                    <i class="material-icons" style="font-size:36px">comment</i>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class="card-body">
+                                        <p class="card-text" id="user_caption" >{{ x.caption }}</p>
+                                        <small class="" id="posted-date">{{ x.date }}</small>
+                                    </div>
                                 </div>
-                                {% endfor %}
                             </div>
-                        </form>
-                    </div>
+                            {% endfor %}
+                        </div>
+                    </form>
                 </div>
+            </div>
         </div>
     </div>
 </div>
@@ -156,39 +234,9 @@
         </div>
     </div>
     <br>
-    <div class="bg-dark">
-        {% if page_obj.has_other_pages %}
-        <ul class="pagination justify-content-center pt-2">
-            {% if page_obj.has_previous %}
-            <a href="?page=1" class="btn btn-outline-secondary mb-3" style="border-radius: 1px; border:solid#d3d3d3;">First</a>
-            <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number}}">
-                <i class="material-icons">&#xe408;</i></a></li>
-            {% else %}
-            <li class="page-item-disabled"></li>
-            {% endif %}
-        
-            {% for i in page_obj.paginator.page_range %}
-            {% if page_obj.number == i %}
-            <li class="page-item-active"><span class="page-link">{{ i }}<span class="sr-only"></span></span></li>
-            {% else %}
-            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
-            {% endif %}
-            {% endfor %}
-        
-            {% if page_obj.has_next %}
-            <li class="page-item">
-            <a class="page-link" href="?page={{page_obj.next_page_number}}">
-                <i class="material-icons">&#xe409;</i></a></li>
-            <a href="?page={{ page_obj.paginator.num_pages}}" class="btn btn-outline-secondary mb-3"
-                style="border-radius: 1px; border:solid#d3d3d3;">Last</a>
-            {% else %}
-            <li class="page-item-disabled"></li>
-            {% endif %}
-            {% endif %}
-    </div>
-<br>
 {% endblock %}
 {% include "footer.html" %}
+{% include "user_base.html" %}
 </div>
 </body>
 <script>
@@ -197,8 +245,55 @@
         return new bootstrap.Tooltip(tooltipTriggerE1)
     })
 
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.like-button').forEach(function (element) {
+        let fileId = element.getAttribute('data-file-id');
+        let icon = element.querySelector('i.material-icons');
+        let likeCountSpan = element.querySelector('span.ms-1');
+
+        // Check local storage for like status
+        if (localStorage.getItem(`liked_${fileId}`) === 'true') {
+            icon.classList.add('liked');
+            icon.classList.remove('not-liked');
+        } else {
+            icon.classList.add('not-liked');
+            icon.classList.remove('liked');
+        }
+
+        element.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevent the default action
+
+            // Make AJAX request to like the image
+            fetch(`/like-image?x_id=${fileId}&next=${encodeURIComponent(window.location.pathname)}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.authenticated === false) {
+                        window.location.href = data.login_url;
+                    } else {
+                        if (data.liked) {
+                            icon.classList.add('liked');
+                            icon.classList.remove('not-liked');
+                            localStorage.setItem(`liked_${fileId}`, 'true');
+                        } else {
+                            icon.classList.add('not-liked');
+                            icon.classList.remove('liked');
+                            localStorage.setItem(`liked_${fileId}`, 'false');
+                        }
+                        likeCountSpan.textContent = data.likes;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>
+    <!--form.action = `/delete_for_me/${postId}/`;-->
 </html>

@@ -1,10 +1,12 @@
 from django.contrib import admin
-from .models import Image, LikeImage, TheProfile, FollowersCount
+from .models import Image, LikeImage, TheProfile, FollowersCount, HiddenPost, Comment
 
 admin.site.register(Image)
 admin.site.register(LikeImage)
 admin.site.register(TheProfile)
 admin.site.register(FollowersCount)
+admin.site.register(HiddenPost)
+admin.site.register(Comment)
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['id', 'image', 'date','caption']

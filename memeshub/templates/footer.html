@@ -16,11 +16,15 @@
     a {
         text-decoration: none;
     }
+    #footer_trendwave{
+        z-index: 1000;
+        transform: translateY(100%);
+        transition: transform 0.3s ease-in-out;
+    }
 </style>
-
 <body>
-    <footer>
-        <div class="container-fluid bg-dark text-light mt-5 pt-5">
+    <footer id="footer_trendwave">
+        <div class="container-fluid bg-dark text-light mt-0 pt-2">
             <div class="container py-5">
                 <div class="row">
                     <div class="col-sm-12 col-md-3 col-lg-3">
@@ -28,7 +32,7 @@
                         <p class="font-weight-light"><a href="mailto:smemeshub@gmail.com">smemeshub@gmail.com</a></p>
                     </div>
                     <div class="col-sm-12 col-md-3 col-lg-3">
-                        <h6>Follow Me</h6>
+                        <h6>Follow Us</h6>
                         <p class="font-weight-light">
                             <a href="https://www.instagram.com/wilfrd_ke" rel="noopener noreferrer" target=_blank>
                                 <img src="{% static 'images/instagram.jpeg' %}" alt="Instagram" class="img-fluid"

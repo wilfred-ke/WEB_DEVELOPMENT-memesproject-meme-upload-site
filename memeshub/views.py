@@ -1,9 +1,25 @@
-from django.shortcuts import render
+from django.core.exceptions import ValidationError
+from .models import Image
+from django.shortcuts import render, redirect
+import tempfile
+import mimetypes
+from django.http import HttpResponse, Http404
+from .models import Image, TheProfile  # Import your models
+from django.shortcuts import redirect, render
+from django.contrib.auth import logout
+from .models import HiddenPost
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Image, HiddenPost, User, TheProfile, LikeImage, FollowersCount, Comment
+from .forms import CommentForm
+from django.db.utils import OperationalError
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.contrib.auth import authenticate
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -12,9 +28,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from .forms import ImageForm
-from .models import TheProfile, Image, LikeImage, FollowersCount
 from django.db.models import Q
-from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -22,42 +36,104 @@ from django.utils.encoding import force_bytes,force_str
 from .tokens import generate_token
 from itertools import chain
 from django.core.mail import EmailMessage, send_mail
+import uuid
 import os
 import re
 import random
+import magic
+import moviepy.editor as mp
+from moviepy import *
+from django.db import DatabaseError
+import logging
 
 IMAGE_FILE_TYPES = ['png', 'jpg', 'jpeg']
+
+
+def validate_file_mimetype(file):
+    accept = [
+        'image/png', 'image/jpg', 'image/jpeg',
+        'video/mp4', 'video/webm', 'video/avi',
+        'video/mov', 'video/gif', 'image/gif',
+        'video/mkv', 'video/ogg', 'video/3gp'
+    ]
+    file_mime_type = magic.from_buffer(file.read(1024), mime=True)
+    file.seek(0)  # Reset file pointer after reading
+    if file_mime_type not in accept:
+        raise ValidationError("Unsupported file format")
+
+
+def validate_video_duration(file_path):
+    video = mp.VideoFileClip(file_path)
+    if video.duration > 60:
+        raise ValidationError("Video length should not exceed 1 minute.")
+
 
 @login_required
 def upload(request):
     if request.method == "POST":
-        user = request.user.username
-        image = request.FILES.get('image_upload')
+        user = request.user
+        file = request.FILES.get('file_upload')
         caption = request.POST['caption']
 
-        new_post = Image.objects.create(user=user, image=image, caption=caption)
+        try:
+            # Validate file type
+            validate_file_mimetype(file)
+
+            # Save the file to a temporary location if it's a video
+            if file.name.endswith(('.mp4', '.avi', '.mov', '.webm', '.mkv', '.gif', '.ogg', '.3gp')):
+                temp_file_path = None
+                try:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.name)[1]) as temp_file:
+                        for chunk in file.chunks():
+                            temp_file.write(chunk)
+                        temp_file_path = temp_file.name
+                    
+                    # Validate the duration of the video
+                    validate_video_duration(temp_file_path)
+                
+                except ValidationError as e:
+                    messages.error(request, str(e))
+                    return redirect('upload')
+        
+        except ValidationError as e:
+            messages.error(request, str(e))
+            return redirect('upload')
+
+        # Save the file to the model
+        new_post = Image.objects.create(user=user, file=file, caption=caption)
         new_post.save()
-        return redirect('homepage')   
+        return redirect('homepage')
     else:
-       form = ImageForm()
+        form = ImageForm()
     return render(request, 'upload.html', {'form': form})
 
-
 def index(request):
+    img = Image.objects.all().order_by('-date')
+
+    for image in img:
+        _, ext = os.path.splitext(image.file.name)
+        image.is_image = ext.lower() in ['.jpg', '.jpeg', '.png', '.gif']
+        image.is_video = ext.lower() in ['.mp4', '.avi', '.mov', '.webm', '.mkv','.3gp', '.gif', 'ogg']
+
     if request.method == 'GET':
         if 'q' in request.GET:
             q = request.GET['q']
-            multiple_q = Q(Q(caption__icontains=q) | Q(date__icontains=q) | Q(user__icontains=q))
+            multiple_q = Q(Q(caption__icontains=q) | Q(
+                date__icontains=q) | Q(user__icontains=q))
             img = Image.objects.filter(multiple_q)
-            
+
             # Check if any results were found
             if not img:
                 messages.info(request, f"No results found for '{q}'.")
         else:
             img = Image.objects.all().order_by('-date')
-
     else:
-        img = Image.objects.all().order_by('-date')
+        img = Image.objects.all().order_by('-date')   
+
+    # Filter out hidden posts for the authenticated user
+    if request.user.is_authenticated:
+      hidden_post = HiddenPost.objects.filter(user=request.user).values_list('post', flat=True)
+      img = img.exclude(id__in=hidden_post)            
 
     user_profile = None
     if request.user.is_authenticated:
@@ -68,7 +144,9 @@ def index(request):
             # If the user profile doesn't exist, use the default profile
             user_profile = TheProfile.objects.get(profileimg=True)
 
-    return render(request, 'index.html', {'img': img, 'user_profile': user_profile})
+    latest_images = Image.objects.all().order_by('date')[:4]
+
+    return render(request, 'index.html', {'img': img, 'user_profile': user_profile, 'latest_images': latest_images})
 
 @login_required
 def LikeView(request, pk):
@@ -117,17 +195,21 @@ def DislikeView(request, pk):
    # You may want to redirect to the login page or a specific URL
    return HttpResponseRedirect(reverse('page'))
 
-
+@login_required
 def download(path):
-   file_path = os.path.join(settings.MEDIA_ROOT, path)
-   if os.path.exists(file_path):
-      with open(file_path, 'rb') as fh:
-         response = HttpResponse(fh.read(), content_type="image/photo")
-         response['Content-Disposition'] = 'inline;filename=' + \
-             os.path.basename(file_path)
-         return response
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if os.path.exists(file_path):
+        mime_type, _ = mimetypes.guess_type(file_path)
+        if mime_type is None:
+            mime_type = "application/octet-stream"
 
-   raise Http404
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type=mime_type)
+            response['Content-Disposition'] = 'inline; filename=' + \
+                os.path.basename(file_path)
+            return response
+
+    raise Http404
 
 def signup(request):
     if request.method == 'POST':
@@ -161,7 +243,7 @@ def signup(request):
 
         # create a profile object for new user
         user_model = User.objects.get(username=username)
-        new_profile = Profile.objects.create(user=user_model, id_user=user_model.id)
+        new_profile = TheProfile.objects.create(user=user_model, id_user=user_model.id)
         new_profile.save()
 
         #welcome email
@@ -212,8 +294,7 @@ regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
 def check(request, email):
      if (re.fullmatch(regex, email)):
-          # TODO: Add implementation
-          pass
+         messages.info(request, 'Your email is valid')
      else:
          messages.error(request, "Your email is invalid")
          return render(request, 'signup.html')
@@ -223,13 +304,17 @@ def signIn(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        next_url = request.POST.get('next')
 
         user = authenticate(username=username, password=password)
 
         if user is not None:
             if user.is_active:
              login(request, user)
-             return redirect('homepage')
+             if next_url:  # If 'next' parameter exists, redirect to that URL
+                return redirect(next_url)
+             else:
+                 return redirect('homepage')
         else:
             messages.error(request, 'Credentials do not Match, Check your name and password again. OR check your email to login if you registered')
             return redirect('signIn')
@@ -285,27 +370,41 @@ def user_settings(request):
    return render(request, 'user_settings.html', {'user_profile': user_profile})
 
 
-@login_required
 def like_image(request):
-   username = request.user.username
-   image_id = request.GET.get('x_id')
+    next_url = request.GET.get('next', '/')
 
-   image = Image.objects.get(id=image_id)
+    if not request.user.is_authenticated:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            login_url = f'{reverse("login")}?next={next_url}'
+            return JsonResponse({'authenticated': False, 'login_url': login_url})
+        else:
+            return redirect(f'{reverse("login")}?next={next_url}')
 
-   like_filter = LikeImage.objects.filter(image_id=image_id, username=username).first()
+    username = request.user.username
+    image_id = request.GET.get('x_id')
 
-   if like_filter == None:
-      new_like = LikeImage.objects.create(image_id=image_id, username=username)
-      new_like.save()
-      image.likes = image.likes + 1
-      image.save()
-      return redirect('homepage')
-   else:
-      like_filter.delete()
-      image.likes = image.likes - 1
-      image.save()
-      return redirect('homepage')
+    image = get_object_or_404(Image, id=image_id)
 
+    like_filter = LikeImage.objects.filter(
+        image_id=image_id, username=username).first()
+    
+    if like_filter is None:
+        new_like = LikeImage.objects.create(
+            image_id=image_id, username=username)
+        new_like.save()
+        image.likes += 1
+        image.save()
+        liked = True
+    else:
+        like_filter.delete()
+        image.likes -= 1
+        image.save()
+        liked = False
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'authenticated': True, 'liked': liked, 'likes': image.likes})
+
+    return redirect(next_url + f'#image-{image_id}')
 
 def profile(request, pk):
     user_object = get_object_or_404(User, username=pk)
@@ -365,12 +464,14 @@ def following(request):
     feed = []
     user_following = FollowersCount.objects.filter(follower=request.user.username)
     
-    for users in user_following:
-        user_following_list.append(users.user)
+    for user_follow in user_following:
+        user = User.objects.get(username=user_follow.user)
+        user_following_list.append(user)
 
     if user_following_list:  # Check if the user is following anyone
-        for usernames in user_following_list:
-            feed_lists = Image.objects.filter(user=usernames)
+        for user in user_following_list:
+            feed_lists = Image.objects.filter(user=user)
+            random.shuffle(feed_lists)
             feed.append(feed_lists)
         feed_list = list(chain(*feed))
     else:
@@ -380,22 +481,22 @@ def following(request):
     all_users = User.objects.all()
     user_following_all = []
 
-    for user in user_following:
-        user_list = User.objects.get(username=user.user)
-        user_following_all.append(user_list)
+    for user_follow in user_following:
+      user_list = User.objects.get(username=user_follow.user)
+      user_following_all.append(user_list)
 
     new_suggestions_list = [x for x in list(all_users) if x not in list(user_following_all)]
     current_user = User.objects.filter(username=request.user.username)
     final_suggestions_list = [x for x in list(new_suggestions_list) if x not in list(current_user)]
-    random.shuffle(final_suggestions_list)
+    random.shuffle(final_suggestions_list)       
 
     username_profile = []
     username_profile_list = []
     for users in final_suggestions_list:
         username_profile.append(users.id)
 
-    for ids in username_profile:
-        profile_lists = TheProfile.objects.filter(id_user=ids)
+    for user_id in username_profile:
+        profile_lists = TheProfile.objects.filter(id_user=user_id)
         username_profile_list.append(profile_lists)
 
     suggestions_username_profile_list = list(chain(*username_profile_list))
@@ -408,11 +509,131 @@ def following(request):
 
 
 def explore(request):
-   return render(request, 'explore.html')
+   user_profile = None
+   if request.user.is_authenticated:
+       try:
+            user_object = User.objects.get(username=request.user.username)
+            user_profile = TheProfile.objects.get(user=user_object)
+       except TheProfile.DoesNotExist:
+            # If the user profile doesn't exist, use the default profile
+            user_profile = TheProfile.objects.get(profileimg=True)
+   return render(request, 'explore.html', {'user_profile':user_profile})
 
 
 def discover(request):
-   return render(request, 'discover.html')
+   user_profile = None
+   if request.user.is_authenticated:
+       try:
+            user_object = User.objects.get(username=request.user.username)
+            user_profile = TheProfile.objects.get(user=user_object)
+       except TheProfile.DoesNotExist:
+            # If the user profile doesn't exist, use the default profile
+            user_profile = TheProfile.objects.get(profileimg=True)
+   return render(request, 'discover.html', {'user_profile':user_profile})
+
+
+@login_required
+def delete_post(request, post_id):    
+    post = get_object_or_404(Image, id=post_id)
+    if request.method == 'POST':
+        if request.user == post.user:
+            post.delete()
+            messages.success(request, "Post deleted successfully.")
+            return redirect(reverse('profile', kwargs={'pk': request.user.username}))
+        else:
+            messages.error(request, 'You are not allowed to delete this post')
+    return render(request, 'profile.html', {'post': post})
+
+
+def delete_user_images(user):
+    images = Image.objects.filter(user=user)
+    for image in images:
+        if image.file and os.path.isfile(image.file.path):
+            os.remove(image.file.path)
+    images.delete()
+
+
+def delete_user_profile_image(user):
+    try:
+        profile = TheProfile.objects.get(user=user)
+        if profile.profileimg and os.path.isfile(profile.profileimg.path):
+            os.remove(profile.profileimg.path)
+        profile.delete()
+    except TheProfile.DoesNotExist:
+        pass
+
+
+@login_required
+def delete_account(request):
+    user = request.user
+    if request.method == 'POST':
+        delete_user_images(user)
+        delete_user_profile_image(user)
+
+        # Delete the user
+        user.delete()
+
+        messages.success(request, "Account deleted successfully.")
+        logout(request)
+        return redirect('signIn')
+    return render(request, 'user_settings.html')
+
+
+@login_required
+def remove_profile_picture(request):
+    profile = get_object_or_404(TheProfile, user=request.user)
+    if request.method == 'POST':
+        if profile.profileimg and os.path.isfile(profile.profileimg.path) and profile.profileimg != 'profile_images/blank_pic.jpg':
+            os.remove(profile.profileimg.path)
+        profile.profileimg = 'blank_pic.jpg'
+        profile.save()
+        messages.success(request, "Profile picture removed successfully.")
+        return redirect('user_settings', pk=profile.user.id)
+    return render(request, 'user_settings.html', {'profile': profile})
+
+
+
+#comments view
+@login_required
+def image_detail(request, file_id):
+    file = get_object_or_404(Image, id=file_id)
+    user_profile = TheProfile.objects.get(user = request.user)
+    comments = Comment.objects.filter(file=file, parent__isnull=True).order_by('-date')
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            parent_id = request.POST.get('parent')
+            parent_comment = None
+            if parent_id:
+                parent_comment = Comment.objects.get(id=parent_id)
+            new_comment = form.save(commit=False)
+            new_comment.user = request.user
+            new_comment.file = file
+            new_comment.parent = parent_comment
+            new_comment.save()
+            # return redirect('image_detail', file_id=file.id)
+            return redirect(f'{request.path}#comment-{new_comment.id}')
+    else:
+        form = CommentForm()
+
+    context = {
+        'file': file,
+        'comments': comments,
+        'form': form,
+        'user_profile':user_profile
+    }
+    return render(request, 'image_detail.html', context)
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, user=request.user)
+    file_id = comment.file.id
+    comment.delete()
+    messages.success(request, "Comment deleted successfully.")
+    return redirect('image_detail', file_id=file_id)
+
+
 # def search_user_query(request):
    # user_object = User.objects.get(username=request.user.username)
    # user_profile = TheProfile.objects.get(user=user_object)

@@ -42,3 +42,21 @@ div#divOne {
     font-family: 'Bree serif', serif;
     color: rgb(7, 7, 7);
 }
+
+.material-icons.liked {
+    color: maroon;
+}
+.material-icons.not-liked {
+    color: black;
+}
+#exploreId{
+    margin-left: 5px;
+}
+ .sidebar {
+     transition: transform 0.3s ease-in-out;
+ }
+
+ .sidebar.hidden {
+     transform: translateX(-100%);
+ }
+

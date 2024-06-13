@@ -3,7 +3,10 @@
         "htmlmin",
         "memehub",
         "memesproject",
+        "moviepy",
         "myform",
-        "profileimg"
+        "profileimg",
+        "theprofile",
+        "trendwave"
     ]
 }

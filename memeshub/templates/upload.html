@@ -1,14 +1,18 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="description"
+        content="Upload your creative content, share your thoughts, and connect with others on TrendWave's upload page. Start sharing your videos, images, stories, and more with our vibrant community.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>memeshub/upload/</title>
+    <title>TrendWave/upload/</title>
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
 </head>
+
 <body>
     <div class="container">
         {% for message in messages %}
@@ -17,21 +21,21 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
         </div>
         {% endfor %}
-        <div class="py-5 bg-secondary text-center text-light">
+        <div class="py-5 bg-secondary text-center text-light pt-3 mt-3">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-md-6">
-                        <h3 class="mb-3">😂Upload meme/mim😂</h3>
+                        <p class="mb-3">Upload Your Creative Content, share your thoughts, and connect with others on TrendWave</p>
                         <hr>
                         <form action="upload" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="form-group">
-                                <input type="file" name="image_upload" class="form-control-file" required>
+                                <input type="file" name="file_upload" class="form-control-file" accept=".png, .jpeg, .jpg, .mp4, .mkv, .webm, .avi, .mov, .gif, .3gp, .ogg" required>
                             </div>
                             <br>
                             <div class="form-group">
                                 <textarea name="caption" class="form-control" cols="30" rows="4"
-                                    placeholder="Add caption"></textarea>
+                                    placeholder="Add caption. Adding a caption enables more user interactivity with your post"></textarea>
                             </div>
                             <br>
                             <div class="form-group">
@@ -42,8 +46,7 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 </body>
+
 </html>

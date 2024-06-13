@@ -11,6 +11,7 @@
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'invite.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
     <title>Explore - TrendWave</title>
 </head>
@@ -24,52 +25,81 @@
                 <div class="col-md-3 d-none d-lg-block d-xl-block">
                     <div class="sidebar border-3 sidebar-item" id="id_sidebar">
                         <!-- Sidebar content -->
-                        <ul>
-                            <a href="/" class="nav-link pt-2"><button class="btn" id="sidebarId">
-                                    <h5>Home</h5>
-                                </button></a>
-                            <a href="#" class="nav-link pt-2"><button class="btn" id="sidebarId">
-                                    <h5>Explore</h5>
-                                </button></a>
-                            <a href="{% url 'following' %}" class="nav-link pt-2"><button class="btn" id="sidebarId">
-                                    <h5>Following</h5>
-                                </button></a>
-                            <a href="{% url 'about' %}" class="nav-link pt-2"><button class="btn" id="sidebarId">
-                                    <h5>About</h5>
-                                </button></a>
-                            <a href="{% url 'discover' %}" class="nav-link pt-2"><button class="btn" id="sidebarId">
-                                    <h5>Discover</h5>
-                                </button></a>
-                            <br></br>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a href="/" class="nav-link d-flex align-items-center">
+                                    <i class="material-icons me-2">&#xe88a;</i>
+                                    <button class="btn" id="sidebarId">
+                                        <h5>Home</h5>
+                                    </button>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'explore' %}" class="nav-link d-flex align-items-center">
+                                    <i class="material-icons me-2">&#xe87a;</i>
+                                    <button class="btn" id="sidebarId">
+                                        <h5>Explore</h5>
+                                    </button>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'following' %}" class="nav-link d-flex align-items-center">
+                                    <i class="material-icons me-2">&#xe7fe;</i>
+                                    <button class="btn" id="sidebarId">
+                                        <h5>Following</h5>
+                                    </button>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'about' %}" class="nav-link d-flex align-items-center">
+                                    <i class="material-icons">&#xe02f;</i><button class="btn" id="sidebarId">
+                                        <h5>About</h5>    
+                                    </button>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'discover' %}" class="nav-link d-flex align-items-center">
+                                    <i class="material-icons me-2">&#xe89e;</i>
+                                    <button class="btn" id="sidebarId">
+                                        <h5>Discover</h5>
+                                    </button>
+                                </a>
+                            </li>
+                            <br>
                             <hr>
-                            <ul class="navbar-toggler">
+                            <li class="nav-item">
                                 <div class="d-none d-lg-block d-xl-block">
                                     {% if user.is_authenticated %}
-                                    {{ pass }}
+                                    <!-- User-specific content goes here -->
                                     {% else %}
-                                    <a href="{% url 'signIn' %}" class="nav-link"><button class="btn btn-outline-danger"
-                                            style="width: 50%;">
+                                    <a href="{% url 'signIn' %}" class="nav-link d-flex justify-content-center">
+                                        <button class="btn btn-outline-danger w-50">
                                             <h4>Log in</h4>
-                                        </button></a>
+                                        </button>
+                                    </a>
                                     {% endif %}
                                 </div>
-                            </ul>
+                            </li>
                         </ul>
                         <footer>
-                            <p style="color: blueviolet;">Join theTrendWave Community.Explore a world of creativity,
-                                entertainment, and
-                                discovery as you scroll through our curated selection of trending topics. From viral
-                                challenges
-                                to the
-                                hottest memes, TrendWave keeps you in the loop with what's capturing the internet's
-                                attention
-                                right
-                                <code>now.</code>
+                            {% if user.is_authenticated %}
+                            <p style="color: blueviolet;">
+                                Welcome back to TrendWave! Keep exploring trending topics, join viral challenges, and enjoy the hottest memes.
+                                Your journey through the best of the internet continues right <code>here.</code>
                             </p>
+                            {% else %}
+                            <p style="color: blueviolet;">
+                                Join TrendWave! Explore creativity, entertainment, and trending topics. Stay in the loop with viral challenges
+                                and the hottest memes right <code>now.</code>
+                            </p>
+                            {% endif %}
                         </footer>
+                        <!--<button class="text-center btn btn-info" id="inviteFriendBtn">
+                            <h5>Invite Friend</h5>
+                        </button>-->
                     </div>
                 </div>
-                <div class="col-lg-9">
+                <div class="col-lg-9 my-3" id="explore">
                     <div class="row justify-content-center">
                         <div class="col-lg-10">
                             <div class="container">
