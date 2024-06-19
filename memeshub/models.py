@@ -108,6 +108,16 @@ class Comment(models.Model):
     def __str__(self):
         return f'{self.user.username} - {self.text[:20]}'
 
+
+class RecentSearch(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    search_term = models.CharField(max_length=50)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'search_term')
+        ordering = ['-timestamp']
+
 class HiddenPost(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Image, on_delete=models.CASCADE)

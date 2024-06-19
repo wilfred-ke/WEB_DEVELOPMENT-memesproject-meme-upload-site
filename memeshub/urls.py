@@ -29,6 +29,8 @@ urlpatterns = [
     path('follow', views.follow, name="follow"),
     path('following', views.following, name='following'),
     path('offline', views.offline, name="offline"),
+    path('recent_searches/', views.recent_searches, name='recent_searches'),
+    path('user_suggestions/', views.user_suggestions, name='user_suggestions'),
     path('user_settings', views.user_settings, name="user_settings"), 
     path('robots.txt', views.robots, name='robots.txt'),
     path('signIn', auth_views.LoginView.as_view(template_name="signIn.html"), name='login'),

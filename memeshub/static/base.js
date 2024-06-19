@@ -1,6 +1,7 @@
 var a;
 let searchForm = document.querySelector("#myform");
 let body_content = document.querySelector("#contentId");
+let userSearch = document.querySelector('#searchId');
 let navbarId = document.querySelector("#navId");
 let following_content = document.querySelector("#following");
 function showForm() {
@@ -8,10 +9,12 @@ function showForm() {
     searchForm.style.visibility = "visible";
     body_content.style.visibility = "hidden";
     navbarId.style.visibility = "visible";
+    userSearch.style.visibility = "visible";
     return (a = 0);
   } else {
     searchForm.style.visibility = "hidden";
     body_content.style.visibility = "visible";
+    userSearch.style.visibility = 'hidden';
     return (a = 1);
   }
 }

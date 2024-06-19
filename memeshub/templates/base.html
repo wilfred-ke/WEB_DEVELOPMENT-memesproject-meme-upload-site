@@ -29,8 +29,7 @@
             <br>
             {% if user.is_authenticated %}
             <!--search for small devices-->
-            <button type="button" id="searchBtn" class="btn btn-xs d-block d-sm-none" onclick="showForm()">
-                <i class="material-icons align-self-center" style="width: 40px;">&#xe8b6;</i></span></button>
+            <button type="button" id="searchBtn" class="btn btn-xs d-block d-sm-none" onclick="showForm()"><i class="material-icons align-self-center" style="width: 40px;">&#xe8b6;</i></span></button>
             <br>
             {% else %}    
             <div class="border-0 d-block d-sm-none pt-2">
@@ -42,12 +41,14 @@
             <!--search bar for large devices i.e desktop, computer etc -->  
             <form action="{% url 'homepage' %}" class="d-flex d-none d-sm-none d-md-block" method="get">
                 {% csrf_token %}
-                <div class="input-group" style="width: 400px;">
+                <div class="input-group" style="width: 400px; position: relative;">
                     <input type="text" name="q" placeholder="Search TrendWave..." id="inputBox"
                         class="form-control form-control-sm rounded-start" style="border-radius: 20px 0 0 20px;" required>
                     <button type="submit" class="btn btn-sm btn-secondary rounded-end" style="border-radius: 0 20px 20px 0;">
                         <i class="material-icon" style="color: goldenrod;">search</i>
                     </button>
+                    <div id="recentSearches" class="dropdown-menu" style="display: none; width: 100%;"></div>
+                    <div id="userSuggestions" class="dropdown-menu" style="display: none; width: 100%;"></div>
                 </div>
             </form>
             <br>
@@ -55,12 +56,14 @@
             <form action="{% url 'homepage' %}" class="d-flex d-none d-sm-block d-md-none justify-content-center" method="get"
                 id="myOtherForm">
                 {% csrf_token %}
-                <div class="input-group" style="width: 400px;">
+                <div class="input-group" style="width: 400px; position: relative;">
                     <input type="text" name="q" placeholder="Search TrendWave..." id="inputBox"
                         class="form-control form-control-sm rounded-start" style="border-radius: 20px 0 0 20px;" required>
                     <button type="submit" class="btn btn-sm btn-secondary rounded-end" style="border-radius: 0 20px 20px 0;">
                         <i class="material-icon" style="color: rgb(252, 186, 19);">search</i>
                     </button>
+                    <div id="recentSearches" class="dropdown-menu" style="display: none; width: 100%;"></div>
+                    <div id="userSuggestions" class="dropdown-menu" style="display: none; width: 100%;"></div>
                 </div>
             </form>
             <button id="searchBtn2" class="border-0 d-none d-sm-block d-md-none" onclick="searchHere()">
@@ -107,12 +110,14 @@
         {% endif %}
     <form action="{% url 'homepage' %}" class="d-flex d-block d-sm-none justify-content-center pt-3 mt-5" method="get" id="myform">
         {% csrf_token %}
-        <div class="input-group" style="width: 300px;">
+        <div class="input-group" style="width: 300px; position: relative;">
             <input type="text" name="q" placeholder="Search TrendWave..." id="inputBox"
                 class="form-control form-control-sm rounded-start" style="border-radius: 20px 0 0 20px;" required>
             <button type="submit" class="btn btn-sm btn-secondary rounded-end" style="border-radius: 0 20px 20px 0;">
                 <i class="material-icon" style="color: goldenrod;">search</i>
             </button>
+            <div id="recentSearches" class="dropdown-menu" style="display: none; width: 100%;"></div>
+            <div id="userSuggestions" class="dropdown-menu" style="display: none; width: 100%;"></div>
         </div>
     </form>
     </ul>
@@ -266,6 +271,7 @@
     </div>
     {% endblock %}
 </body>
-<script type="text/javascript" src="{% static 'base.js' %}"></script>
+<!--<script type="text/javascript" src="{% static 'base.js' %}"></script>-->
 <script type="text/javascript" src="{% static 'invite.js' %}"></script>
+<script type="text/javascript" src="{% static 'recent-search.js' %}"></script>
 </html>

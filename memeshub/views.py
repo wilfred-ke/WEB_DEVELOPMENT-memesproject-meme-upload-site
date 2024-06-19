@@ -1,5 +1,6 @@
+import json
+from django.utils.timezone import now
 from django.core.exceptions import ValidationError
-from .models import Image
 from django.shortcuts import render, redirect
 import tempfile
 import mimetypes
@@ -9,7 +10,7 @@ from django.contrib.auth import logout
 from .models import HiddenPost
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import Image, HiddenPost, User, TheProfile, LikeImage, FollowersCount, Comment
+from .models import Image, User, TheProfile, LikeImage, FollowersCount, Comment, RecentSearch
 from .forms import CommentForm
 from django.db.utils import OperationalError
 from django.shortcuts import render, redirect, get_object_or_404
@@ -122,46 +123,87 @@ def upload(request):
         form = ImageForm()
     return render(request, 'upload.html', {'form': form})
 
-def index(request):
-    img = Image.objects.all().order_by('-date')
 
-    for image in img:
-        _, ext = os.path.splitext(image.file.name)
-        image.is_image = ext.lower() in ['.jpg', '.jpeg', '.png', '.gif']
-        image.is_video = ext.lower() in ['.mp4', '.avi', '.mov', '.webm', '.mkv','.3gp', '.gif', 'ogg']
+def get_recent_searches_from_cookies(request):
+    recent_searches_cookie = request.COOKIES.get('recent_searches')
+    if recent_searches_cookie:
+        return json.loads(recent_searches_cookie)
+    return []
 
-    if request.method == 'GET':
-        if 'q' in request.GET:
-            q = request.GET['q']
-            multiple_q = Q(Q(caption__icontains=q) | Q(
-                date__icontains=q) | Q(user__icontains=q))
-            img = Image.objects.filter(multiple_q)
 
-            # Check if any results were found
-            if not img:
-                messages.info(request, f"No results found for '{q}'.")
-        else:
-            img = Image.objects.all().order_by('-date')
-    else:
-        img = Image.objects.all().order_by('-date')   
-
-    # Filter out hidden posts for the authenticated user
+def save_search_term(request, q, recent_searches):
     if request.user.is_authenticated:
-      hidden_post = HiddenPost.objects.filter(user=request.user).values_list('post', flat=True)
-      img = img.exclude(id__in=hidden_post)            
+        RecentSearch.objects.update_or_create(
+            user=request.user, search_term=q, defaults={'timestamp': now()}
+        )
+    else:
+        if q not in recent_searches:
+            recent_searches.append(q)
+            if len(recent_searches) > 10:  # Limit to last 10 searches
+                recent_searches.pop(0)
 
-    user_profile = None
+
+def get_search_results(q):
+    multiple_q = Q(Q(caption__icontains=q) | Q(
+        date__icontains=q) | Q(user__username__icontains=q))
+    return Image.objects.filter(multiple_q)
+
+
+def get_user_profile(request):
     if request.user.is_authenticated:
         try:
             user_object = User.objects.get(username=request.user.username)
-            user_profile = TheProfile.objects.get(user=user_object)
+            return TheProfile.objects.get(user=user_object)
         except TheProfile.DoesNotExist:
-            # If the user profile doesn't exist, use the default profile
-            user_profile = TheProfile.objects.get(profileimg=True)
+            return TheProfile.objects.get(profileimg=True)
+    return None
 
-    latest_images = Image.objects.all().order_by('date')[:4]
 
-    return render(request, 'index.html', {'img': img, 'user_profile': user_profile, 'latest_images': latest_images})
+def get_user_suggestions(q):
+    return User.objects.filter(username__icontains=q)[:5]
+
+
+def get_latest_images():
+    return Image.objects.all().order_by('date')[:4]
+
+
+def set_recent_searches_cookie(response, recent_searches):
+    response.set_cookie('recent_searches', json.dumps(
+        recent_searches), max_age=30*24*60*60)  # 30 days
+
+
+def index(request):
+    img = Image.objects.all().order_by('-date')
+    recent_searches = get_recent_searches_from_cookies(request)
+    user_suggestions = []
+
+    if request.method == 'GET' and 'q' in request.GET:
+        q = request.GET['q']
+        save_search_term(request, q, recent_searches)
+        img = get_search_results(q)
+
+        if not img.exists():
+            messages.info(request, f"No results found for '{q}'.")
+
+        user_suggestions = get_user_suggestions(q)
+    else:
+        img = Image.objects.all().order_by('-date')
+
+    user_profile = get_user_profile(request)
+    latest_images = get_latest_images()
+
+    response = render(request, 'index.html', {
+        'img': img,
+        'user_profile': user_profile,
+        'latest_images': latest_images,
+        'recent_searches': recent_searches,
+        'user_suggestions': user_suggestions,
+    })
+
+    if not request.user.is_authenticated:
+        set_recent_searches_cookie(response, recent_searches)
+
+    return response
 
 
 @login_required
@@ -655,6 +697,15 @@ def handler404(request, exception):
 def handler500(request):
     return render(request, 'custom-error.html', status=500)
 
+#user search
+def recent_searches(request):
+    recent_searches = RecentSearch.objects.filter(user=request.user).values('search_term')[:10]
+    return render(request, 'index.html', {'recent_searches': list(recent_searches)})
+
+def user_suggestions(request):
+    q = request.GET.get('q', '')
+    user_suggestions = User.objects.filter(username__icontains=q).values('username')[:5]
+    return render(request, 'index.html', {'user_suggestions': list(user_suggestions)})
   
 
 # def search_user_query(request):

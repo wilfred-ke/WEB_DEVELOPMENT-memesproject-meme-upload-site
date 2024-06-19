@@ -294,9 +294,30 @@
 {% include "footer.html" %}
 {% include "user_base.html" %}
 </div>
+<div class="container-fluid bg-secondary" id="searchId">
+    <div>
+        <h5>Recent Searches</h5>
+        <ul>
+            {% for search in recent_searches %}
+            <li>{{ search }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div>
+        <h5>User Suggestions</h5>
+        <ul>
+            {% for user in user_suggestions %}
+            <li>{{ user.username }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 <script src="{% static 'check-connection.js' %}"></script>
 <script src="{% static 'like-file.js' %}"></script>
 <script src="{% static 'cookie-consent.js' %}"></script>
+<script type="text/javascript" src="{% static 'base.js' %}"></script>
+<script type="text/javascript" src="{% static 'recent-search.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>
