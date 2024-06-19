@@ -29,6 +29,17 @@ class TheProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+    def get_comments_count(self):
+        user_images = Image.objects.filter(user=self.user)
+        comments_count = Comment.objects.filter(file__in=user_images).count()
+        return comments_count
+
+    def get_likes_count(self):
+        user_images = Image.objects.filter(user=self.user)
+        likes_count = LikeImage.objects.filter(image_id__in=user_images.values('id')).count()
+        return likes_count
+
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -36,7 +47,7 @@ def generate_uuid():
 class Image(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    file = models.FileField(upload_to="post_images/", null=False, validators=[ext_validator, validate_file_mimetype])
+    file = models.FileField(upload_to="post_files/", null=False, validators=[ext_validator, validate_file_mimetype])
     caption = models.TextField(max_length=200, editable=True, default='...')
     date = models.DateTimeField(default=datetime.now, editable=False)
     likes = models.IntegerField(default=0)
@@ -87,7 +98,7 @@ class Comment(models.Model):
     file = models.ForeignKey(Image, related_name="comments", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=datetime.now)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
 
 

@@ -17,6 +17,7 @@
         crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <title>TrendWave - Ride the Wave of Trends</title>
 </head>
@@ -152,7 +153,7 @@
                                     </div>
                                     <a href="{% url 'image_detail' x.id %}" class="text-decoration-none">
                                         {% if x.file.url|is_image %}
-                                        <img src="{{ x.file.url }}" alt="" class="card-img-top img-fluid" style="height: 400px;">
+                                        <img src="{{ x.file.url }}" alt="trendwave_files" class="card-img-top img-fluid" style="height: 450px;">
                                         {% elif x.file.url|is_video %}
                                         <video class="card-img-top img-fluid" controls preload="metadata" aria-describedby="video-description">
                                             <source src="{{ x.file.url }}" type="video/mp4">
@@ -170,8 +171,7 @@
                                     <div class="card-footer align-items-center">
                                         <div class="d-flex justify-content-between align-items-center w-100">
                                             <div>
-                                                <a href="{{ x.file.url }}" data-bs-toggle="modal" data-bs-target="#shareModal"
-                                                    class="share-button text-decoration-none">
+                                                <a href="#" class="share-button text-decoration-none" onclick="openShareModal('{{ x.file.url }}')">
                                                     <i class="material-icons">&#xe80d;</i>
                                                 </a>
                                                 <div class="d-inline-flex align-items-center">
@@ -211,89 +211,95 @@
 
 <br>
     <br>
-    <div class="modal fade" id="shareModal">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="text-primary">Share to:</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    {% load static %}
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-                    {% post_to_facebook object_or_url '<i style="font-size:24px" class="fa">&#xf082;facebook</i>'%}&nbsp;
-                    {% post_to_whatsapp object_or_url '<i style="font-size:24px" class="fa text-success">&#xf232;whatsapp</i>'%}&nbsp;
-                    {% post_to_telegram 'Hey! Check out this meme 😊' object_or_url '<i style="font-size:24px" class="fa text-primary">&#xf2c6;telegram</i>' %}&nbsp;
-                    {% post_to_twitter 'Hey! check out this meme 😊' object_or_url '<i style="font-size:24px" class="fa">&#xf081;twitter</i>' %}&nbsp;
-                    {% send_email 'funny meme' 'Hey! check out this meme 😊' object_or_url '<i class="material-icons" id="mail" style="color: brown;">&#xe0be;</i>' %}                              
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
-                </div>
+    <!-- Share Modal -->
+    <div id="shareModal" class=" modal share-modal">
+        <div class="share-modal-content">
+            <span class="close-button" onclick="closeShareModal()" onkeydown="handleKeyPress(event)" tabindex="0">&times;</span>
+            <h4>Share this file</h4>
+            <div id="shareOptions" class="list-group pt-2">
+                <!-- Sharing options will be dynamically inserted here -->
+            </div>
+            <div class="input-group">
+                <input type="text" id="fileLink" class="form-control mt-3" value="{{ x.file.url }}" readonly>
             </div>
         </div>
     </div>
     <br>
+<!-- Cookie Consent Banner -->
+<div class="cookie-consent-banner bg-dark text-light p-3" id="cookieConsentBanner">
+    <div class="container d-flex flex-column flex-lg-row justify-content-between align-items-center">
+        <div class="cookie-consent-text mb-2 mb-lg-0">
+            <p>We use cookies to personalize content and ads, to provide social media features and to analyze our
+                traffic. Read our <a href="{% url 'privacy' %}" class="text-info text-decoration-none">Privacy
+                    Policy</a> for more information.</p>
+        </div>
+        <div class="cookie-consent-buttons">
+            <button class="btn btn-primary me-2 mb-2 mb-lg-0" id="acceptCookies">Accept</button>
+            <button class="btn btn-secondary me-2 mb-2 mb-lg-0" id="rejectCookies">Reject</button>
+            <button class="btn btn-outline-light mx-2 my-2 mb-lg-0" id="customizeCookies">Customize</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cookie Settings Modal -->
+<div class="modal fade" id="cookieSettingsModal" tabindex="-1" aria-labelledby="cookieSettingsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cookieSettingsModalLabel">Cookie Preferences</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Here at TrendWave, we respect your privacy and are committed to being transparent about the technologies we use. This Cookie Policy explains how and why cookies and similar technologies may be stored on and accessed from your device when you use or visit our website.</p>
+                <p>By clicking "Save Preferences", you agree to our use of cookies as described in our <a
+                        href="{% url 'privacy' %}" class="text-decoration-none">Privacy Policy</a></p>
+                <form id="cookiePreferencesForm">
+                    <!-- Essential Cookies -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="essentialCookies" checked disabled>
+                        <label class="form-check-label" for="essentialCookies">Essential Cookies (Always Active)</label>
+                        <small class="">These cookies are necessary for the website to function and cannot be switched off in our systems.</small>
+                    </div>
+                    <!-- Analytics Cookies -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="analyticsCookies">
+                        <label class="form-check-label text-secondary" for="analyticsCookies">Analytics Cookies</label>
+                        <small class="">These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site.</small>
+                    </div>
+                    <!-- Marketing Cookies -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="marketingCookies">
+                        <label class="form-check-label text-secondary" for="marketingCookies">Marketing Cookies</label>
+                        <small class="">These cookies may be set through our site by our advertising partners to build a profile of your interests and show you relevant adverts on other sites.</small>
+                    </div>
+                    <!-- Social Media Cookies -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="socialMediaCookies">
+                        <label class="form-check-label text-secondary" for="socialMediaCookies">Social Media Cookies</label>
+                        <small class="">These cookies are set by a range of social media services that we have added to the site to enable you to share our content with your friends and networks.</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <!-- Save Preferences Button -->
+                <button type="button" class="btn btn-primary" id="savePreferences">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}
 {% include "footer.html" %}
 {% include "user_base.html" %}
 </div>
-</body>
-<script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerE1) {
-        return new bootstrap.Tooltip(tooltipTriggerE1)
-    })
-
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.like-button').forEach(function (element) {
-        let fileId = element.getAttribute('data-file-id');
-        let icon = element.querySelector('i.material-icons');
-        let likeCountSpan = element.querySelector('span.ms-1');
-
-        // Check local storage for like status
-        if (localStorage.getItem(`liked_${fileId}`) === 'true') {
-            icon.classList.add('liked');
-            icon.classList.remove('not-liked');
-        } else {
-            icon.classList.add('not-liked');
-            icon.classList.remove('liked');
-        }
-
-        element.addEventListener('click', function (event) {
-            event.preventDefault(); // Prevent the default action
-
-            // Make AJAX request to like the image
-            fetch(`/like-image?x_id=${fileId}&next=${encodeURIComponent(window.location.pathname)}`, {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.authenticated === false) {
-                        window.location.href = data.login_url;
-                    } else {
-                        if (data.liked) {
-                            icon.classList.add('liked');
-                            icon.classList.remove('not-liked');
-                            localStorage.setItem(`liked_${fileId}`, 'true');
-                        } else {
-                            icon.classList.add('not-liked');
-                            icon.classList.remove('liked');
-                            localStorage.setItem(`liked_${fileId}`, 'false');
-                        }
-                        likeCountSpan.textContent = data.likes;
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        });
-    });
-});
-</script>
+<script src="{% static 'check-connection.js' %}"></script>
+<script src="{% static 'like-file.js' %}"></script>
+<script src="{% static 'cookie-consent.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>
     <!--form.action = `/delete_for_me/${postId}/`;-->
+</body>   
 </html>

@@ -4,10 +4,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="description"
-        content="Upload your creative content, share your thoughts, and connect with others on TrendWave's upload page. Start sharing your videos, images, stories, and more with our vibrant community.">
+    <meta name="description" content="Upload your creative content, share your thoughts, and connect with others on TrendWave's upload page. Start sharing your videos, images, stories, and more with our vibrant community.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TrendWave/upload/</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <title>TrendWave - Upload/</title>
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
@@ -27,7 +27,7 @@
                     <div class="col-md-6">
                         <p class="mb-3">Upload Your Creative Content, share your thoughts, and connect with others on TrendWave</p>
                         <hr>
-                        <form action="upload" method="post" enctype="multipart/form-data">
+                        <form action="upload" id="uploadForm" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="form-group">
                                 <input type="file" name="file_upload" class="form-control-file" accept=".png, .jpeg, .jpg, .mp4, .mkv, .webm, .avi, .mov, .gif, .3gp, .ogg" required>
@@ -47,6 +47,45 @@
             </div>
         </div>
     </div>
+<script>
+document.getElementById("upload").addEventListener("click", function (event) {
+    const form = document.getElementById("uploadForm");
+    const formData = new FormData(form);
+
+    const uploadButton = document.getElementById("upload");
+    uploadButton.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Uploading...';
+    uploadButton.disabled = true;
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => { throw new Error(errorData.error); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            window.location.href = data.redirect_url || "/";
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        })
+        .finally(() => {
+            uploadButton.innerHTML = 'Upload';
+            uploadButton.disabled = false;
+        });
+
+    event.preventDefault();
+});
+</script>
+<script src="{% static 'check-connection.js' %}"></script>
 </body>
 
 </html>

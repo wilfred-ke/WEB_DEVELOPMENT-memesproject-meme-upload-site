@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect
 import tempfile
 import mimetypes
 from django.http import HttpResponse, Http404
-from .models import Image, TheProfile  # Import your models
 from django.shortcuts import redirect, render
 from django.contrib.auth import logout
 from .models import HiddenPost
@@ -24,7 +23,6 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import View
-from django.core.paginator import Paginator
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from .forms import ImageForm
@@ -36,6 +34,8 @@ from django.utils.encoding import force_bytes,force_str
 from .tokens import generate_token
 from itertools import chain
 from django.core.mail import EmailMessage, send_mail
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.conf import settings
 import uuid
 import os
 import re
@@ -64,9 +64,22 @@ def validate_file_mimetype(file):
 
 def validate_video_duration(file_path):
     video = mp.VideoFileClip(file_path)
-    if video.duration > 60:
+    if video.duration > 61:
         raise ValidationError("Video length should not exceed 1 minute.")
 
+def is_ajax(request):
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+def handle_ajax_response(request, message, status):
+    if request.is_ajax():
+        return JsonResponse({'error' if status != 200 else 'message': message}, status=status)
+    messages.error(request, message)
+    return redirect('upload')
+
+def checkpath(request, x):
+    if not os.path.exists(x.file.path):
+        message = "Failed to save the file. Please try again."
+        return handle_ajax_response(request, message, 500)
 
 @login_required
 def upload(request):
@@ -92,16 +105,18 @@ def upload(request):
                     validate_video_duration(temp_file_path)
                 
                 except ValidationError as e:
-                    messages.error(request, str(e))
-                    return redirect('upload')
+                    return handle_ajax_response(request, str(e), 400)
         
         except ValidationError as e:
-            messages.error(request, str(e))
-            return redirect('upload')
+            return handle_ajax_response(request, str(e), 400)
 
         # Save the file to the model
         new_post = Image.objects.create(user=user, file=file, caption=caption)
         new_post.save()
+        
+        if is_ajax(request):
+            return JsonResponse({'message': 'File uploaded successfully!'}, status=200)
+        
         return redirect('homepage')
     else:
         form = ImageForm()
@@ -148,52 +163,6 @@ def index(request):
 
     return render(request, 'index.html', {'img': img, 'user_profile': user_profile, 'latest_images': latest_images})
 
-@login_required
-def LikeView(request, pk):
-   if request.user.is_authenticated:
-      meme = get_object_or_404(Image, id=request.POST.get('meme_id'))
-
-      # Check if the user has already disliked the post
-      if meme.dislikes.filter(id=request.user.id):
-         messages.warning(
-             request, 'You cannot like and dislike the same meme.')
-         return HttpResponseRedirect(reverse('page'))
-
-      if meme.likes.filter(id=request.user.id):
-         meme.likes.remove(request.user)
-      else:
-          meme.likes.add(request.user)
-
-      return HttpResponseRedirect(reverse('page'))
-
-   # Handle the case when the user is not authenticated
-   messages.success(request, 'You must be logged in to like this meme.')
-   return HttpResponseRedirect(reverse('page'))
-
-
-@login_required
-def DislikeView(request, pk):
-   if request.user.is_authenticated:
-      meme = get_object_or_404(Image, id=request.POST.get('meme_id'))
-
-      # Check if the user has already liked the meme
-      if meme.likes.filter(id=request.user.id):
-         messages.warning(
-             request, 'You cannot like and dislike the same meme.')
-         return HttpResponseRedirect(reverse('page'))
-
-      if meme.dislikes.filter(id=request.user.id):
-         meme.dislikes.remove(request.user)
-      else:
-         meme.dislikes.add(request.user)
-
-        # Redirect back to the previous page or a specific URL
-      return HttpResponseRedirect(reverse('page'))
-
-    # Handle the case when the user is not authenticated
-   messages.success(request, 'You must be logged in to dislike this meme.')
-   # You may want to redirect to the login page or a specific URL
-   return HttpResponseRedirect(reverse('page'))
 
 @login_required
 def download(path):
@@ -210,6 +179,32 @@ def download(path):
             return response
 
     raise Http404
+
+# Function to generate a token
+def generate_token():
+    return PasswordResetTokenGenerator()
+
+# Function to check if password is strong
+def is_strong_password(password):
+    if len(password) < 8:
+        return False
+    has_upper = False
+    has_lower = False
+    has_digit = False
+    has_special = False
+    special_characters = "!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?"
+    
+    for char in password:
+        if char.isupper():
+            has_upper = True
+        elif char.islower():
+            has_lower = True
+        elif char.isdigit():
+            has_digit = True
+        elif char in special_characters:
+            has_special = True
+    
+    return has_upper and has_lower and has_digit and has_special
 
 def signup(request):
     if request.method == 'POST':
@@ -228,13 +223,18 @@ def signup(request):
 
         elif len(username) > 10:
            messages.error(request, 'Username must not exceed 10 characters')
+
+        elif not username.isalnum():
+           messages.error(request, "Username must be Alpha-Numeric")
+           return render(request, 'signup.html')   
+
         elif password and password != password2:
            messages.error(request, "Passwords didn't match")
            return render(request, 'signup.html')
 
-        elif not username.isalnum():
-           messages.error(request, "Username must be Alpha-Numeric")
-           return render(request, 'signup.html')
+        elif not is_strong_password(password):
+            messages.error(request, "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")
+            return render(request, 'signup.html')  
 
         myuser = User.objects.create_user(username, email, password)
         myuser.is_active = False
@@ -248,10 +248,11 @@ def signup(request):
 
         #welcome email
         subject = "Welcome to TrendWave login"
-        message = "Hello, " + myuser.username + "\n" + "Welcome to TrendWave!! \n Thank you for visiting our website \n Please confirm your email address in order to activate your account. \n\n Thanking you\n TrendWave - Ride the Wave of Trends."
+        message = f"Hello, {myuser.username}\n\nWelcome to TrendWave!!\n\nThank you for visiting our website. Please confirm your email address to activate your account.\n\nThank you,\nTrendWave - Ride the Wave of Trends."
         from_email = settings.EMAIL_HOST_USER
         to_list = [myuser.email]
         send_mail(subject, message, from_email, to_list, fail_silently=True)
+
         #confirmation email
         current_site = get_current_site(request)
         email_subject = 'Confirm your email @TrendWave -Login!'
@@ -343,10 +344,13 @@ def about(request):
     return render(request, 'about.html')
 
 def blogs(request):
-    return render(request, 'MhBlogs.html')
+    return render(request, 'trendwave_blogs.html')
 
 def privacy(request):
    return render(request, 'privacy.html')
+
+def offline(request):
+    return render(request, 'offline.html')
 
 @login_required
 def user_settings(request):
@@ -409,7 +413,9 @@ def like_image(request):
 def profile(request, pk):
     user_object = get_object_or_404(User, username=pk)
     user_profile = get_object_or_404(TheProfile, user=user_object)
-    user_posts = Image.objects.filter(user=user_object)
+    comments_count = user_profile.get_comments_count()
+    likes_count = user_profile.get_likes_count()
+    user_posts = Image.objects.filter(user=user_object).order_by('-date')
     user_post_length = len(user_posts)
 
     follower = request.user.username
@@ -424,6 +430,8 @@ def profile(request, pk):
     user_following = len(FollowersCount.objects.filter(follower=pk))
 
     context = {
+        'comments_count': comments_count,
+        'likes_count': likes_count,
         'user_object': user_object,
         'user_profile': user_profile,
         'user_posts': user_posts,
@@ -533,8 +541,14 @@ def discover(request):
 
 
 @login_required
-def delete_post(request, post_id):    
-    post = get_object_or_404(Image, id=post_id)
+def delete_post(request, post_id):
+    try:
+        post_uuid = uuid.UUID(post_id)
+    except ValueError:
+        messages.error(request, 'Invalid post ID')
+        return redirect('profile', pk=request.user.username)
+        
+    post = get_object_or_404(Image, id=post_uuid)
     if request.method == 'POST':
         if request.user == post.user:
             post.delete()
@@ -633,6 +647,15 @@ def delete_comment(request, comment_id):
     messages.success(request, "Comment deleted successfully.")
     return redirect('image_detail', file_id=file_id)
 
+#handle error
+def handler404(request, exception):
+    return render(request, 'custom-error.html', status=404)
+
+
+def handler500(request):
+    return render(request, 'custom-error.html', status=500)
+
+  
 
 # def search_user_query(request):
    # user_object = User.objects.get(username=request.user.username)

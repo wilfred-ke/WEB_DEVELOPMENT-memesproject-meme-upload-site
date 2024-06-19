@@ -138,7 +138,7 @@
                     <span style="color: rgb(211, 131, 131); font-size: 27px;">{{ user_post_length }} Posts</span>
                     {% endif %}
                 </p>
-                <p>Comments: [Number of Comments] | Likes Received: [Number of Likes Received]</p>
+                <p>Comments: {{ comments_count }} | Likes Received: {{ likes_count }}</p>
                 <p>Followers: {{ user_followers }} | Following: {{ user_following }}</p>
                 <input type="hidden" value="{{ user.username }}" name="follower" />
                 <input type="hidden" value="{{ user_object.username }}" name="user" />
@@ -179,12 +179,15 @@
                                 <i class="material-icons">delete</i>
                             </button>
                             {% endif %}
+                            <small class="text-secondary" id="posted-date">posted-on {{ post.date }}</small>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
+        {% elif user.username %}
+        <p class="text-info text-center">No post, your posts will appear here</p>
         {% else %}
         <p class="text-info text-center">No post, user posts will appear here</p>
         {% endif %}
@@ -214,21 +217,21 @@
     </div>
     <footer>
         <div class="container text-center py-3">
-            <p style="font-size: 12px;">Copyright &copy; TrendWave LLC 2024</p>
+            <p style="font-size: 12px;">Copyright &copy; TrendWave 2024 All Rights Reserved</p>
         </div>
     </footer>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Attach event listener to each delete button
             document.querySelectorAll('.delete-post-btn').forEach(function (button) {
                 button.addEventListener('click', function () {
                     const postId = this.getAttribute('data-post-id');
                     const form = document.getElementById('deletePostForm');
-                    form.action = `/delete_post/${postId}/`;  // Construct the URL directly
+                    form.action = `/delete_post/${postId}/`;  // Constructing the URL directly
                 });
             });
         });
     </script>
+    <script src="{% static 'check-connection.js' %}"></script>
 </body>
 
 </html>

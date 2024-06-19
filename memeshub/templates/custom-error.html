@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Page Not Found</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .error-container {
+            max-width: 600px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .error-title {
+            font-size: 96px;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .btn-home {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <div class="error-title">Oops!</div>
+        <div class="error-message">Something went wrong. The page you're looking for can't be found.</div>
+        <form class="search-bar" action="{% url 'homepage' %}" method="get">
+            {% csrf_token %}
+            <input type="text" name="q" class="form-control" placeholder="Search for content...">
+        </form>
+        <a href="/" class="btn btn-primary btn-home">Go to Homepage</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

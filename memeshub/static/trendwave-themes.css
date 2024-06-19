@@ -59,12 +59,10 @@ ul#myList {
 }
 
 .navbar-brand h1,
-h2,
-h3 {
+h2,h3 {
     font-family: 'Bree Serif', serif;
     color: #333;
 }
-
 /* CSS for desktop screens */
 @media (min-width: 992px) {
     .navbar hr {
@@ -299,4 +297,22 @@ h3 {
 
 .dark-theme .user_post_date {
     color: rgb(173, 170, 170);
+}
+.dark-theme #close_btn :hover{
+    color: #c5c3c3;
+}
+.dark-theme .modal-body #cookiePreferencesForm small{
+    color:#c7c2c2;
+}
+.dark-theme .container-fluid a div.custom-font{
+    color: #f8f5f5;
+}
+.light-theme .container-fluid a div.custom-font{
+    color: #000000;
+}
+.dark-theme h4.display-6#user_account{
+    color: #c5c3c3;
+}
+.dark-theme h4.text-xl#user_general{
+    color: #f8f5f5;
 }

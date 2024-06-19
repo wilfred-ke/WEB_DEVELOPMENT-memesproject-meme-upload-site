@@ -4,6 +4,7 @@ from django.contrib.auth import views as auth_views
 from .import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import handler404, handler500
 
 urlpatterns = [
     path('', views.index, name="homepage"),
@@ -27,8 +28,7 @@ urlpatterns = [
     path('comment/delete/<int:comment_id>/', views.delete_comment, name='delete_comment'),
     path('follow', views.follow, name="follow"),
     path('following', views.following, name='following'),
-    path('like/<int:pk>', views.LikeView, name="like_meme"),
-    path('dislike/<int:pk>', views.DislikeView, name='dislike_meme'),
+    path('offline', views.offline, name="offline"),
     path('user_settings', views.user_settings, name="user_settings"), 
     path('robots.txt', views.robots, name='robots.txt'),
     path('signIn', auth_views.LoginView.as_view(template_name="signIn.html"), name='login'),
@@ -38,5 +38,9 @@ urlpatterns = [
     path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(template_name="password_reset_done.html"), name='password_reset_complete'),
               
 ]
+handler404 = 'memeshub.views.handler404'
+handler500 = 'memeshub.views.handler500'
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

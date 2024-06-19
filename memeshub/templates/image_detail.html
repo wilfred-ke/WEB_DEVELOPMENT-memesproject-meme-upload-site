@@ -6,91 +6,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="View and comment on this image on TrendWave. Share your thoughts, engage with other users, and stay updated with the latest trends.">
-    <title>Image Detail | Comments</title>
+    <meta name="description" content="View and comment on this file on TrendWave. Share your thoughts, engage with other users, and stay updated with the latest trends.">
+    {% if file.file.url|is_image %}
+    <title>view Image - trendwave | Comments</title>
+    {% elif file.file.url|is_video %}
+    <title>Watch Video - trendwave | Comments</title>
+    {% endif %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
         crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <style>
-        .card {
-            background-color: rgb(19, 15, 15);
-            color: rgb(173, 170, 170);
-        }
-
-        .list-group-item {
-            background-color: rgb(19, 15, 15);
-            color: rgb(173, 170, 170);
-            border: 0;
-        }
-
-        .form-group {
-            background-color: rgb(19, 15, 15);
-        }
-
-        .comment {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .comment.right {
-            justify-content: flex-end;
-        }
-
-        .comment-text {
-            max-width: 75%;
-        }
-
-        .comment-buttons {
-            margin-left: 10px;
-        }
-
-        .reply {
-            margin-left: 30px;
-        }
-
-        .reply-form {
-            margin-left: 30px;
-            margin-top: 10px;
-        }
-
-        .comment-container {
-            margin-bottom: 10px;
-        }
-
-        .comment-container.right {
-            text-align: right;
-        }
-
-        .comment-container.right .comment-text {
-            text-align: left;
-        }
-         .reply-textarea {
-            width: 100%;
-            resize: vertical;
-        }
-        #user_comment_text{
-            color: rgb(173, 170, 170);
-        }
-
-        @media (max-width: 576px) {
-            .button-group {
-                flex-direction: column;
-            }
-
-            .button-group button {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-
-            .button-group button:last-child {
-                margin-bottom: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'file-detail.css' %}">
 </head>
 
 <body class="bg-dark">
@@ -129,8 +58,14 @@
                         {% else %}
                         <p>Unsupported file type.</p>
                         {% endif %}
-                        <p class="mt-3">{{ file.caption }}</p>
-                        <small class="">{{ file.date }}</small>
+                        <p class="mt-3" style="text-align: left; color: black; font-size: 25px;">{{ file.caption }}</p>
+                        <div class="d-lex align-items-center justify-content-between mb-0">
+                            <small class="float-start">{{ file.date }}</small>
+                            <a href="#" class="float-end share-button text-decoration-none" onclick="openShareModal('{{ file.file.url }}')">
+                                <i class="material-icons">&#xe80d;</i>
+                            </a>
+                        </div>
+                        
                     </div>
                     {% endif %}
                 </div>
@@ -239,6 +174,20 @@
         </div>
     </div>
     </div>
+    <!-- Share Modal -->
+    <div id="shareModal" class=" modal share-modal">
+        <div class="share-modal-content">
+            <span class="close-button" onclick="closeShareModal()" onkeydown="handleKeyPress(event)"
+                tabindex="0">&times;</span>
+            <h4>Share this file</h4>
+            <div id="shareOptions" class="list-group pt-2">
+                <!-- Sharing options will be dynamically inserted here -->
+            </div>
+            <div class="input-group">
+                <input type="text" id="fileLink" class="form-control mt-3" value="{{ file.file.url }}" readonly>
+            </div>
+        </div>
+    </div>
     {% include "user_base.html" %}
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -272,6 +221,8 @@
         });
     });
     </script>
+    <script src="{% static 'check-connection.js' %}"></script>
+    <script src="{% static 'share.js' %}" defer></script>
 </body>
 
 </html>

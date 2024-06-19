@@ -1,0 +1,34 @@
+<!-- offline.html -->
+ {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Internet Connection</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .message {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="message">
+        <h1>No Internet Connection</h1>
+        <p>Please check your internet connection and try again.</p>
+        <p style="color: rgb(184, 182, 182);">Trendwave - Ride the Wave of Trends</p>
+    </div>
+<script src="{% static 'connected.js' %}"></script>
+</body>
+</html>

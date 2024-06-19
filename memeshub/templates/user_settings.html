@@ -15,18 +15,18 @@
     <title>user_settings</title>
 </head>
 
-<body>
+<body onload="userAlert()">
     <div id="contentId">
     {% include "base.html" %}
     <div class="container m-auto">
-        <h3 class="display-6 mt-3"> Account Setting for <b>{{ user.username }}</b> </h3>
+        <h4 class="display-6 mt-3" id="user_account"> Account Setting for <b>{{ user.username }}</b> </h4>
 
         <div class="grid lg:grid-cols-3 mt-12 gap-8">
             <div>
-                <h3 class="text-xl mb-2">General</h3>
+                <h4 class="text-xl mb-2" id="user_general">General</h4>
                 <p></p>
             </div>
-            <div class="bg-white rounded-md lg:shadow-lg shadow col-span-2">
+            <div class="bg-white rounded-md col-span-2">
                 <form action="user_settings" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
@@ -35,8 +35,7 @@
                                 <img src="{{ user_profile.profileimg.url }}" width="150px" height="150px" class="rounded-circle"
                                     alt="">
                             </a>
-                            <input type="file" name="image" id="fileInput" value="{{ user_profile.profileimg }}"
-                                class="form-control bg-gray-100" style="display: none;" onchange="this.form.submit()">
+                            <input type="file" name="image" id="fileInput" value="{{ user_profile.profileimg }}" class="form-control bg-gray-100" style="display: none;" onchange="this.form.submit()">
                         </div>
             
                         <!-- Profile Options Section -->
@@ -46,13 +45,13 @@
                             <button type="button" id="removeProfilePictureBtn" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#removeProfilePictureModal">Remove Profile</button>
                         </div>
                         <div class="col-span-2">
-                            <label for="bio" class="form-label">Bio</label>
-                            <textarea id="bio" name="bio"
+                            <label for="bio" class="form-label" id="user_bio">Bio</label>
+                            <textarea id="bio" name="bio" placeholder="enter bio"
                                 class="form-control shadow-none bg-gray-100">{{ user_profile.bio }}</textarea>
                         </div>
                         <div class="col-span-2">
-                            <label for="location" class="form-label"> Location</label>
-                            <input type="text" name="location" value="{{ user_profile.location }}" class="form-control bg-gray-100">
+                            <label for="location" class="form-label" id="user_location"> Location</label>
+                            <input type="text" name="location" value="{{ user_profile.location }}" class="form-control bg-gray-100" id="location" placeholder="enter your location">
                         </div>
                         <div class="col-span-2 mt-2 my-2 mx-2">
                             <button type="button" class="btn btn-danger" id="deleteAccountBtn" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete Account</button>
@@ -133,7 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('removeProfilePictureBtn').addEventListener('click', function() {
         new bootstrap.Modal(document.getElementById('removeProfilePictureModal')).show();
     });
-    });    
+    });
+    function userAlert(){
+        alert('click on the profile to change or remove Profile picture')
+    }    
 </script>
 </body>
 </html>
